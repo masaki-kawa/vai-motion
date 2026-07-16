@@ -1,0 +1,18 @@
+/node_modules
+/.next
+/out
+/build
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+.env*
+!.env.example
+.vercel
+
+# local automation artifacts (browser profiles hold cookies — never commit)
+/outbound
+/.playwright-mcp
+
+# internal business docs stay out of the public repo
+/SALES-EXECUTION-KIT.md
+/JAPAN-MARKET-SPEC.md

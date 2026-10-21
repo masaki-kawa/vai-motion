@@ -21,7 +21,7 @@ export const I18N: Record<Lang, Record<string, string>> = {
     /* ---- hero ---- */
     "hero.badge": "Motion design · AI reels · Instagram posting",
     "hero.decor": "made and posted for you",
-    "hero.title": "Motion that <em>stops the scroll.</em>",
+    "hero.title": "No filming. <em>Just great videos.</em>",
     "hero.sub": "Motion-graphic promos for brands and products, plus AI-made reels and Instagram posting for local shops. Finished by a human, every time.",
     "hero.cta.work": "See the work",
     "hero.reel": "Showreel",
@@ -231,7 +231,7 @@ export const I18N: Record<Lang, Record<string, string>> = {
     /* ---- hero ---- */
     "hero.badge": "モーション動画 · AIリール · Instagram投稿",
     "hero.decor": "制作から投稿まで代行",
-    "hero.title": "スクロールを止める、<wbr><em>動く映像</em>を。",
+    "hero.title": "撮らずに、<wbr><em>魅せる。</em>",
     "hero.sub": "ブランドやプロダクトのための<wbr>モーショングラフィックスから、<wbr>店舗向けのAIリール制作・<wbr>Instagram投稿まで。<wbr>すべて人の手で仕上げます。",
     "hero.cta.work": "制作実績を見る",
     "hero.reel": "ショーリール",

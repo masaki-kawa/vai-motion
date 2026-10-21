@@ -20,7 +20,7 @@ type ReelCardProps = {
   wide?: boolean;
   /** Recent Work: minimal custom player WITH sound. Hero: muted, click-to-toggle. */
   controls?: boolean;
-  /** Hero scatter: silent auto-looping ambient video — no play button, no click. */
+  /** Hero side reels: silent auto-looping ambient video — no play button, no click. */
   ambient?: boolean;
 };
 
@@ -37,7 +37,7 @@ export default function ReelCard({
   const rootRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [c1, c2] = TINTS[cat] ?? TINTS.rest;
+  const [c1, c2] = TINTS[cat] ?? ["#E3ECFA", "#F4F8FE"];
   const media = VIDEOS[cat];
   // Recent Work ("controls") gets a custom bar + sound; Hero is a muted click-to-play tile.
   const isPlayer = controls;

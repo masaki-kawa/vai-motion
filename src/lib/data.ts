@@ -72,39 +72,8 @@ export const WORK: WorkItem[] = [
   { cat: "saasad", wide: true },
 ];
 
-/** off-screen launch vectors for the hero scatter fly-in [fx, fy] */
-export const FROM: Record<string, [string, string]> = {
-  L: ["-65vw", "-4vh"],
-  R: ["65vw", "6vh"],
-  T: ["3vw", "-60vh"],
-  B: ["-5vw", "60vh"],
-  TL: ["-55vw", "-45vh"],
-  TR: ["52vw", "-48vh"],
-  BL: ["-50vw", "50vh"],
-  BR: ["55vw", "46vh"],
-};
+/** hero showreel — swap in the new motion-graphics reel here when it lands */
+export const HERO_REEL: VideoSrc = VIDEOS.brand!;
 
-export type ScatterCard = {
-  cat: Category;
-  left: number;
-  top: number;
-  w: number;
-  rot: number;
-  from: keyof typeof FROM | string;
-  d: number;
-  spin: number;
-  bdur: number;
-  wide?: boolean;
-};
-
-/* positions are % within the hero's right-column stage, spread across ≈10–90% in three
-   loose rows so the cards breathe horizontally instead of clustering — see Hero.tsx */
-export const HERO_SCATTER: ScatterCard[] = [
-  { cat: "jp", left: 31, top: 15, w: 144, rot: 7, from: "T", d: 0.13, spin: 24, bdur: 8.0 },
-  { cat: "saas", left: 74, top: 16, w: 204, rot: -6, from: "TR", d: 0.16, spin: -22, bdur: 7.1, wide: true },
-  { cat: "beauty", left: 10, top: 47, w: 150, rot: -8, from: "TL", d: 0.06, spin: -28, bdur: 6.6 },
-  { cat: "gym", left: 47, top: 46, w: 168, rot: -3, from: "B", d: 0, spin: -12, bdur: 6.0 },
-  { cat: "language", left: 90, top: 51, w: 124, rot: -11, from: "TR", d: 0.32, spin: -30, bdur: 7.3 },
-  { cat: "brand", left: 22, top: 83, w: 210, rot: 5, from: "BL", d: 0.2, spin: 18, bdur: 7.6, wide: true },
-  { cat: "rest", left: 64, top: 84, w: 142, rot: 9, from: "R", d: 0.27, spin: 30, bdur: 6.9 },
-];
+/** vertical reels drifting beside the hero showreel (first two left, last two right) */
+export const HERO_SIDE: Category[] = ["beauty", "gym", "rest", "jp"];

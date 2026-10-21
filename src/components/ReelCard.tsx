@@ -20,7 +20,7 @@ type ReelCardProps = {
   wide?: boolean;
   /** Recent Work: minimal custom player WITH sound. Hero: muted, click-to-toggle. */
   controls?: boolean;
-  /** Hero scatter: silent auto-looping ambient video — no play button, no click. */
+  /** Hero side reels: silent auto-looping ambient video — no play button, no click. */
   ambient?: boolean;
 };
 

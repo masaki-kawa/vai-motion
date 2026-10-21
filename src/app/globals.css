@@ -359,38 +359,87 @@ section[id] {
   box-shadow: 0 6px 20px rgba(20, 24, 28, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* hero scatter: cards fly in from all directions, then drift gently */
-.scatter-stage {
-  position: relative;
-  height: clamp(440px, 52vw, 580px);
-  /* no overflow:hidden — cards stay inset (see HERO_SCATTER) and float fully un-clipped;
-     the hero <section> still clips the fly-in entry so nothing scrolls the page */
+/* hero: staggered rise-in, then the showreel grows and side reels drift with scroll (--hp 0→1) */
+.hero {
+  --hp: 0;
 }
-.scatter-cell {
+.hero-glow {
   position: absolute;
-  transform: translate(-50%, -50%);
+  inset: -20% -10% auto;
+  height: 900px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 20% 30%, rgba(79, 132, 214, 0.18), transparent 70%),
+    radial-gradient(35% 45% at 82% 22%, rgba(248, 170, 204, 0.16), transparent 70%),
+    radial-gradient(30% 40% at 55% 60%, rgba(252, 215, 120, 0.12), transparent 70%);
+  animation: glowDrift 18s ease-in-out infinite alternate;
 }
-.scatter-fly {
-  transform: rotate(var(--rot, 0deg));
-  animation: flyIn 1.05s cubic-bezier(0.18, 0.8, 0.22, 1) var(--delay, 0s) backwards;
+@keyframes glowDrift {
+  to {
+    transform: translate3d(3%, 4%, 0) scale(1.08);
+  }
 }
-.scatter-bob {
-  animation: bob var(--bdur, 7s) ease-in-out var(--bdelay, 0s) infinite;
+.hero-title {
+  font-size: clamp(42px, 7.6vw, 96px);
+  line-height: 1.02;
 }
-@keyframes flyIn {
+html.lang-ja .hero-title {
+  font-size: clamp(34px, 6vw, 76px);
+  line-height: 1.18;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(100deg, #335fb0, #4f84d6 35%, #c86fa6 70%, #e8a84a);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 6s ease-in-out infinite alternate;
+}
+@keyframes sheen {
+  to {
+    background-position: 100% 0;
+  }
+}
+.hero-in {
+  animation: heroRise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes heroRise {
   from {
-    transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--spin, 0deg)) scale(0.5);
     opacity: 0;
+    transform: translateY(28px);
+    filter: blur(8px);
   }
 }
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-11px);
-  }
+.hero-reel {
+  aspect-ratio: 16 / 9;
+  border-radius: calc(32px - 12px * var(--hp));
+  transform: scale(calc(0.88 + 0.12 * var(--hp)));
+  transform-origin: 50% 0;
+  box-shadow: 0 40px 120px -30px rgba(20, 40, 80, 0.45);
+  will-change: transform;
+}
+.hero-side {
+  position: absolute;
+  top: 8%;
+  z-index: 20;
+  flex-direction: column;
+  gap: 16px;
+  will-change: transform;
+}
+.hero-side > * {
+  border-radius: 20px;
+  box-shadow: 0 24px 60px -20px rgba(20, 40, 80, 0.4);
+}
+.hero-side--l {
+  left: -70px;
+  transform: translateY(calc(40px - 120px * var(--hp))) rotate(-6deg);
+}
+.hero-side--r {
+  right: -70px;
+  top: 24%;
+  transform: translateY(calc(80px - 200px * var(--hp))) rotate(5deg);
 }
 
 /* text ribbon */
@@ -422,9 +471,15 @@ section[id] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scatter-fly,
-  .scatter-bob,
+  .hero-in,
+  .hero-glow,
+  .hero-title em,
   .ribbon-track {
     animation: none;
+  }
+  .hero-reel,
+  .hero-side--l,
+  .hero-side--r {
+    --hp: 1;
   }
 }

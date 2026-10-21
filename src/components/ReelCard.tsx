@@ -37,7 +37,7 @@ export default function ReelCard({
   const rootRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [c1, c2] = TINTS[cat] ?? TINTS.rest;
+  const [c1, c2] = TINTS[cat] ?? ["#E3ECFA", "#F4F8FE"];
   const media = VIDEOS[cat];
   // Recent Work ("controls") gets a custom bar + sound; Hero is a muted click-to-play tile.
   const isPlayer = controls;

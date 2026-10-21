@@ -6,7 +6,8 @@ import ReelCard from "./ReelCard";
 import { HERO_REEL, HERO_SIDE } from "@/lib/data";
 
 export default function Hero() {
-  const { t } = useT();
+  const { t, cur } = useT();
+  const reel = HERO_REEL[cur];
   const sectionRef = useRef<HTMLElement>(null);
 
   const lead = t("hero.lead");
@@ -96,9 +97,10 @@ export default function Hero() {
 
         <div className="hero-reel relative overflow-hidden bg-accent-soft">
           <video
+            key={reel.src}
             className="absolute inset-0 h-full w-full object-cover"
-            src={HERO_REEL.src}
-            poster={HERO_REEL.poster}
+            src={reel.src}
+            poster={reel.poster}
             autoPlay
             muted
             loop

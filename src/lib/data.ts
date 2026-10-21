@@ -70,10 +70,11 @@ export const WORK: WorkItem[] = [
   { cat: "unjumble", wide: true },
 ];
 
-/** hero showreel: VAI MOTION's own 19s brand film (silent, seamless loop) */
-export const HERO_REEL: VideoSrc = {
-  src: "/assets/vai-motion-showreel.mp4",
-  poster: "/assets/vai-motion-showreel-poster.jpg",
+/** hero showreel: VAI MOTION's own 22s brand film, one cut per language (plays muted, seamless loop).
+ *  Both cuts open on the same wordless frame, so they share one poster. */
+export const HERO_REEL: Record<Lang, VideoSrc> = {
+  en: { src: "/assets/vai-motion-film-en.mp4", poster: "/assets/vai-motion-film-poster.jpg" },
+  ja: { src: "/assets/vai-motion-film-ja.mp4", poster: "/assets/vai-motion-film-poster.jpg" },
 };
 
 /** vertical reels drifting beside the hero showreel (first two left, last two right) */

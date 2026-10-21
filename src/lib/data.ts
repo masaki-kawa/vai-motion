@@ -72,7 +72,7 @@ export const WORK: WorkItem[] = [
   { cat: "saasad", wide: true },
 ];
 
-/** hero showreel: VAI MOTION's own 20s brand film (silent, seamless loop) */
+/** hero showreel: VAI MOTION's own 19s brand film (silent, seamless loop) */
 export const HERO_REEL: VideoSrc = {
   src: "/assets/vai-motion-showreel.mp4",
   poster: "/assets/vai-motion-showreel-poster.jpg",

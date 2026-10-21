@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useT } from "./LangProvider";
 import ReelCard from "./ReelCard";
 import { HERO_REEL, HERO_SIDE } from "@/lib/data";
 
 export default function Hero() {
-  const { t, cur } = useT();
+  const { t } = useT();
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
 
   const lead = t("hero.lead");
   const hasLead = Boolean(lead) && lead !== "hero.lead";
@@ -35,15 +33,6 @@ export default function Hero() {
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
-
-  const toggleSound = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    const next = !muted;
-    v.muted = next;
-    setMuted(next);
-    if (v.paused) void v.play();
-  };
 
   const tags = [t("hero.tag1"), t("hero.tag2"), t("hero.tag3")];
 
@@ -105,9 +94,8 @@ export default function Hero() {
           ))}
         </div>
 
-        <div className="hero-reel relative overflow-hidden bg-ink">
+        <div className="hero-reel relative overflow-hidden bg-accent-soft">
           <video
-            ref={videoRef}
             className="absolute inset-0 h-full w-full object-cover"
             src={HERO_REEL.src}
             poster={HERO_REEL.poster}
@@ -118,19 +106,6 @@ export default function Hero() {
             preload="auto"
             aria-label={t("hero.reel")}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
-          <span className="absolute left-4 bottom-4 sm:left-6 sm:bottom-5 inline-flex items-center gap-2 text-[12px] sm:text-[13px] font-bold uppercase tracking-[0.16em] text-white/90">
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            {t("hero.reel")}
-          </span>
-          <button
-            type="button"
-            onClick={toggleSound}
-            aria-pressed={!muted}
-            className="absolute right-4 top-4 sm:right-6 sm:top-5 rounded-full bg-white/15 px-3.5 py-1.5 text-[12px] sm:text-[13px] font-semibold text-white backdrop-blur-md hover:bg-white/25 transition-colors"
-          >
-            {muted ? (cur === "ja" ? "音を出す" : "Sound on") : cur === "ja" ? "ミュート" : "Mute"}
-          </button>
         </div>
 
         <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] sm:text-[14px] font-semibold text-ink-soft">

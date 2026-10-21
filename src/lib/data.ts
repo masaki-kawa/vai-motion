@@ -72,8 +72,11 @@ export const WORK: WorkItem[] = [
   { cat: "saasad", wide: true },
 ];
 
-/** hero showreel — swap in the new motion-graphics reel here when it lands */
-export const HERO_REEL: VideoSrc = VIDEOS.brand!;
+/** hero showreel: VAI MOTION's own 20s brand film (silent, seamless loop) */
+export const HERO_REEL: VideoSrc = {
+  src: "/assets/vai-motion-showreel.mp4",
+  poster: "/assets/vai-motion-showreel-poster.jpg",
+};
 
 /** vertical reels drifting beside the hero showreel (first two left, last two right) */
 export const HERO_SIDE: Category[] = ["beauty", "gym", "rest", "jp"];

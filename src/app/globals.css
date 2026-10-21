@@ -371,8 +371,8 @@ section[id] {
   pointer-events: none;
   background:
     radial-gradient(40% 50% at 20% 30%, rgba(79, 132, 214, 0.18), transparent 70%),
-    radial-gradient(35% 45% at 82% 22%, rgba(248, 170, 204, 0.16), transparent 70%),
-    radial-gradient(30% 40% at 55% 60%, rgba(252, 215, 120, 0.12), transparent 70%);
+    radial-gradient(35% 45% at 82% 22%, rgba(156, 192, 245, 0.22), transparent 70%),
+    radial-gradient(30% 40% at 55% 60%, rgba(234, 241, 251, 0.9), transparent 70%);
   animation: glowDrift 18s ease-in-out infinite alternate;
 }
 @keyframes glowDrift {
@@ -390,7 +390,7 @@ html.lang-ja .hero-title {
 }
 .hero-title em {
   font-style: normal;
-  background: linear-gradient(100deg, #335fb0, #4f84d6 35%, #c86fa6 70%, #e8a84a);
+  background: linear-gradient(100deg, #335fb0, #4f84d6 40%, #9cc0f5 70%, #335fb0);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;

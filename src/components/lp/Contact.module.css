@@ -1,0 +1,518 @@
+/* Contact — the second dark moment: a full-bleed night frame with a near-opaque
+   white glass form card. Monochrome only; every error state is ink, never colour. */
+
+.section {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  background: linear-gradient(180deg, #0b0d10 0%, #121519 100%);
+}
+
+.inner {
+  padding-top: 88px;
+  padding-bottom: 96px;
+}
+@media (min-width: 600px) {
+  .inner {
+    padding-top: 120px;
+    padding-bottom: 128px;
+  }
+}
+@media (min-width: 900px) {
+  .inner {
+    padding-top: 160px;
+    padding-bottom: 160px;
+  }
+}
+
+/* ---- layout: phones read head → card → "what happens next";
+   desktop puts head and next in columns 1–5 and the card in 7–12 ---- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.head,
+.cardWrap,
+.next {
+  min-width: 0;
+}
+.cardWrap {
+  margin-top: 48px;
+}
+.next {
+  margin-top: 64px;
+}
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    column-gap: 32px;
+  }
+  .head {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+  .next {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+    align-self: start;
+    margin-top: 48px;
+  }
+  .cardWrap {
+    grid-column: 7 / span 6;
+    grid-row: 1 / span 2;
+    align-self: start;
+    margin-top: 0;
+  }
+}
+
+/* ---- H2: one mask per word (EN) or <wbr> phrase (JA) ---- */
+.title .word:global(.m-line) {
+  display: inline-block;
+  max-width: 100%;
+  /* top-aligned, so an overflow:hidden inline-block adds no descender space per line */
+  vertical-align: top;
+  /* room for g / y / p descenders at line-height 1.0 */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+/* a deeper start than the shared 105%, so no ascender tip peeks over the mask */
+.title .word > span {
+  transform: translate3d(0, 125%, 0);
+}
+.title:global(.is-in) .word > span {
+  transform: none;
+}
+.stop {
+  margin-left: -0.07em;
+}
+
+/* JA prose: wrap at phrase boundaries where the browser can, normal breaking elsewhere */
+.jaPhrase {
+  word-break: auto-phrase;
+  overflow-wrap: anywhere;
+}
+
+/* ---- "What happens after you send this": label | sentence rows ---- */
+.step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 4px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+@media (min-width: 480px) {
+  .step {
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: baseline;
+  }
+}
+.stepLabel {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a7adb3;
+}
+.stepLabelJa {
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ---- the card ---- */
+.formCard {
+  position: relative;
+  /* the field grid goes two-up only when the card's content box has room for it */
+  container-type: inline-size;
+  border-radius: 24px;
+  padding: 20px;
+  color: var(--m-ink);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: inset 0 1px 0 #fff, 0 2px 6px rgba(0, 0, 0, 0.16), 0 40px 100px -40px rgba(0, 0, 0, 0.8);
+}
+@media (min-width: 600px) {
+  .formCard {
+    border-radius: 28px;
+    padding: 32px;
+  }
+}
+@media (min-width: 900px) {
+  .formCard {
+    border-radius: 32px;
+    padding: 40px;
+  }
+}
+
+/* form and success panel share one stage, so the card never jumps */
+.stage {
+  position: relative;
+}
+.stageDone {
+  overflow: hidden;
+}
+.form {
+  transition: opacity 0.5s var(--m-ease) 0.1s;
+}
+.formOut {
+  position: absolute;
+  inset: 0 0 auto 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@container (min-width: 380px) {
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.full {
+  grid-column: 1 / -1;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* a field that appears when the plan changes settles in, it doesn't pop */
+.enter {
+  animation: ctEnter 0.45s var(--m-ease) both;
+}
+
+/* ---- labels ---- */
+.label {
+  display: block;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--m-ink);
+}
+.legend {
+  margin-bottom: 8px;
+}
+.tag {
+  margin-left: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--m-mute);
+  white-space: nowrap;
+}
+
+/* ---- inputs ---- */
+.control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  margin: 0;
+  padding: 0 16px;
+  font-size: 16px; /* 16px: iOS never zooms on focus */
+  line-height: 1.4;
+  color: var(--m-ink);
+  background: #fff;
+  border: 1px solid #d5d8db;
+  border-radius: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.control::placeholder {
+  color: var(--m-mute);
+  opacity: 1;
+}
+.control:hover {
+  border-color: #b4b9be;
+}
+.control[aria-invalid="true"] {
+  border-color: var(--m-ink);
+  box-shadow: inset 0 0 0 1px var(--m-ink);
+}
+/* beats the page-wide `.lp :focus-visible` outline (and its 6px radius) inside the card */
+.section .formCard .control:focus {
+  outline: none;
+  border-radius: 14px;
+  border-color: var(--m-ink);
+  box-shadow: 0 0 0 3px rgba(20, 24, 28, 0.12);
+}
+.section .formCard .control[aria-invalid="true"]:focus {
+  box-shadow: inset 0 0 0 1px var(--m-ink), 0 0 0 3px rgba(20, 24, 28, 0.12);
+}
+.textarea {
+  height: auto;
+  min-height: 136px;
+  padding: 12px 16px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* selects: thin SVG chevron, muted while the placeholder shows */
+.selWrap {
+  position: relative;
+}
+.select {
+  padding-right: 44px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.select[data-empty] {
+  color: var(--m-mute);
+}
+.select option,
+.select optgroup {
+  color: var(--m-ink);
+}
+.chev {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  margin-top: -8px;
+  color: var(--m-ink);
+  pointer-events: none;
+}
+/* the plan was just picked from a pricing card: the select holds an ink ring, then settles */
+.flash .select {
+  animation: ctFlash 1.4s var(--m-ease) 0.8s backwards;
+}
+
+.help {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--m-soft);
+}
+.fieldErr {
+  padding-left: 10px;
+  border-left: 2px solid var(--m-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--m-ink);
+}
+
+/* ---- yes / no: segmented pill with a sliding ink thumb ---- */
+.seg {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-self: flex-start;
+  height: 48px;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #d5d8db;
+  border-radius: 999px;
+}
+.thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #2a2f35 0%, #14181c 60%, #0d1013 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 10px -4px rgba(20, 24, 28, 0.5);
+  opacity: 0;
+  transition: transform 0.45s var(--m-ease), opacity 0.25s ease;
+}
+.seg[data-v="yes"] .thumb {
+  opacity: 1;
+}
+.seg[data-v="no"] .thumb {
+  opacity: 1;
+  transform: translateX(100%);
+}
+.segOpt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  cursor: pointer;
+}
+.segInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.segText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 96px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--m-ink);
+  transition: color 0.3s ease, background-color 0.2s ease;
+}
+.segOpt:hover .segInput:not(:checked) + .segText {
+  background: var(--m-paper2);
+}
+.segInput:checked + .segText {
+  color: #fff;
+}
+.section .formCard .segInput:focus-visible + .segText {
+  outline: 2px solid var(--m-ink);
+  outline-offset: 2px;
+}
+
+/* ---- note, error, submit ---- */
+.note {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--m-mute);
+}
+.alert {
+  padding: 14px 16px;
+  background: var(--m-paper2);
+  border-left: 2px solid var(--m-ink);
+  border-radius: 2px 12px 12px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--m-ink);
+  animation: ctEnter 0.4s var(--m-ease) both;
+}
+.submit {
+  width: 100%;
+  height: 52px;
+  margin-top: 8px;
+  padding: 0 24px;
+  font-size: 17px;
+}
+.submit[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.86;
+  transform: none;
+}
+.section .formCard .submit:focus-visible {
+  outline: 2px solid var(--m-ink);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* ---- success panel: same card, same height on desktop ---- */
+.ok {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* phones: no need to keep a very tall card once the form is gone */
+  min-height: min(var(--h, 0px), 34rem);
+  /* a little more room below than above: the text sits at the optical centre */
+  padding: 32px 0 72px;
+  animation: ctIn 0.6s var(--m-ease) 0.2s both;
+}
+@media (min-width: 900px) {
+  .ok {
+    min-height: var(--h, 0px);
+  }
+}
+.okTitle {
+  max-width: 18em;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--m-ink);
+  text-wrap: balance;
+}
+.section .formCard .okTitle:focus {
+  outline: none;
+}
+.okBody {
+  max-width: 30em;
+  margin-top: 14px;
+  font-size: 16px;
+  color: var(--m-soft);
+  text-wrap: pretty;
+}
+.textBtn {
+  align-self: flex-start;
+  margin-top: 28px;
+  padding: 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--m-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(20, 24, 28, 0.32);
+  text-underline-offset: 6px;
+  transition: text-decoration-color 0.3s ease;
+}
+.textBtn:hover {
+  text-decoration-color: var(--m-ink);
+}
+.section .formCard .textBtn:focus-visible {
+  outline-color: var(--m-ink);
+}
+
+@keyframes ctEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ctIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ctFlash {
+  from {
+    border-color: #14181c;
+    box-shadow: 0 0 0 4px rgba(20, 24, 28, 0.14);
+  }
+  to {
+    border-color: #d5d8db;
+    box-shadow: 0 0 0 0 rgba(20, 24, 28, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title .word > span {
+    transform: none !important;
+    transition: none !important;
+  }
+  .enter,
+  .alert,
+  .ok,
+  .flash .select {
+    animation: none;
+  }
+  .form,
+  .formOut,
+  .thumb,
+  .segText,
+  .control {
+    transition: none;
+  }
+}

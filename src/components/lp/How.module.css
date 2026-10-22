@@ -1,0 +1,139 @@
+/* How it works — five steps under one progress track, then the owner's part and a CTA.
+   Resting states are the visible ones under prefers-reduced-motion (track full). */
+
+/* ---- section H2 (also used by Faq through <SplitTitle>): one mask per word (EN) or
+   <wbr> phrase (JA). How.tsx measures the line each mask sits on and staggers it 80ms. ---- */
+.title .word:global(.m-line) {
+  display: inline-block;
+  max-width: 100%;
+  /* top-aligned, so an overflow:hidden inline-block adds no descender space per line */
+  vertical-align: top;
+  /* room for g / y descenders at line-height 1.02 */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+/* deeper start than the shared 105%, so no ascender tip peeks over the mask */
+.title .word > span {
+  transform: translate3d(0, 125%, 0);
+}
+.title:global(.is-in) .word > span {
+  transform: none;
+}
+
+/* ---- the track: one hairline under all five steps (desktop) or down their left (phones).
+   Each step owns the ink fill for its own stretch, so the fill lands exactly on the step
+   boundaries. The steps carry no gaps, so the stretches join into one line. ---- */
+.steps {
+  position: relative;
+}
+.steps::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  /* rgba(20,24,28,.10) on white, opaque so the stretches never double up */
+  background: #e8e8e8;
+  pointer-events: none;
+}
+.step {
+  position: relative;
+}
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--m-ink);
+  pointer-events: none;
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 0.7s var(--m-ease);
+  /* set per step so a fast scroll that passes several steps fills them in a chain */
+  transition-delay: var(--fd, 0ms);
+}
+/* overlap the next stretch by 1px so no hairline seam shows at fractional widths */
+.step:not(:last-child) .fill {
+  bottom: -1px;
+}
+.step[data-on] .fill {
+  transform: none;
+}
+
+.label {
+  transition: color 0.5s ease;
+  transition-delay: var(--fd, 0ms);
+}
+.step[data-on] .label {
+  color: var(--m-ink);
+}
+
+@media (min-width: 900px) {
+  .steps::before {
+    top: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+  .fill {
+    top: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  .step:not(:last-child) .fill {
+    bottom: auto;
+    right: -1px;
+  }
+}
+
+/* steps reveal one by one on phones; on desktop the row arrives together, staggered */
+.content {
+  --d: 0ms;
+}
+@media (min-width: 900px) {
+  .content {
+    --d: var(--sd, 0ms);
+  }
+}
+
+/* ---- JA step titles (and FAQ questions): keep words whole. keep-all is the fallback;
+   auto-phrase, where supported, breaks at natural phrase boundaries instead of letting
+   overflow-wrap split a word at whatever character overflows. ---- */
+.jaPhrase {
+  word-break: keep-all;
+  word-break: auto-phrase;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+
+/* ---- the owner's part: 21px on phones, then the spec's fluid size ---- */
+.close {
+  font-size: 21px;
+}
+@media (min-width: 900px) {
+  .close {
+    font-size: clamp(22px, 2.4vw, 32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title .word > span {
+    transform: none !important;
+    transition: none !important;
+  }
+  .fill {
+    transform: none !important;
+    transition: none !important;
+  }
+  .label {
+    color: var(--m-ink);
+    transition: none !important;
+  }
+}

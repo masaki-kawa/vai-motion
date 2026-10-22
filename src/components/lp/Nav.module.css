@@ -1,0 +1,525 @@
+/* =========================================================================
+   Nav — floating monochrome glass pill.
+   Light frosted glass over light sections; dark glass while the pill overlaps
+   a section[data-theme="dark"] (Nav.tsx sets data-tone on the pill).
+   Every tone change (fill, rim, text, logo, toggle, CTA) runs on one clock.
+   ========================================================================= */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* ---- the pill ---- */
+.pill {
+  --tone: 0.42s;
+  --gut: 22px;
+  pointer-events: auto;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  /* links stay centred on the pill while both sides fit; a wider side takes what it needs */
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  width: calc(100% - 32px);
+  max-width: 1120px;
+  height: 60px;
+  margin: 16px auto 0;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: var(--m-ink);
+  background-color: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(20, 24, 28, 0.04),
+    0 14px 36px -16px rgba(20, 24, 28, 0.24);
+  transition:
+    background-color var(--tone) var(--m-ease),
+    box-shadow var(--tone) var(--m-ease),
+    color var(--tone) var(--m-ease);
+}
+.enter {
+  animation: navIn 0.7s var(--m-ease) 0.08s both;
+}
+@keyframes navIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+/* conic rims: light and dark stacked, cross-faded with the tone */
+.pill::before,
+.pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity var(--tone) var(--m-ease);
+}
+.pill::before {
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(20, 24, 28, 0.16) 12%,
+    rgba(255, 255, 255, 0.6) 45%,
+    rgba(20, 24, 28, 0.1) 62%,
+    rgba(255, 255, 255, 0.9)
+  );
+}
+.pill::after {
+  opacity: 0;
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+/* dark glass: white .06 over a night tint, so white text holds even over a light edge */
+.pill[data-tone="dark"] {
+  color: #fff;
+  background-color: rgba(34, 37, 41, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 18px 40px -18px rgba(0, 0, 0, 0.6);
+}
+.pill[data-tone="dark"]::before {
+  opacity: 0;
+}
+.pill[data-tone="dark"]::after {
+  opacity: 1;
+}
+
+/* focus ring follows the tone; pills keep their shape when focused */
+.pill[data-tone="dark"] :focus-visible {
+  outline-color: #fff;
+}
+.pill .btn:focus-visible,
+.pill .seg button:focus-visible {
+  border-radius: 999px;
+}
+
+/* ---- logo ---- */
+.brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  /* symmetric pill padding keeps the links on the true centre; the logo takes its own inset */
+  margin-left: calc(var(--gut) - 10px);
+  border-radius: 8px;
+}
+/* the lockup PNG has wide transparent margins: crop the box to its ink so the size is exact */
+.lockup {
+  position: relative;
+  display: block;
+  height: 34px;
+  aspect-ratio: 1524 / 374;
+  overflow: hidden;
+}
+.lockupImg,
+.markImg {
+  filter: brightness(1) invert(0);
+  transition: filter var(--tone) var(--m-ease);
+}
+.lockupImg {
+  position: absolute;
+  left: -12.336%;
+  top: -59.091%;
+  width: 125.984%;
+  max-width: none;
+  height: auto;
+}
+.markImg {
+  display: none;
+  height: 28px;
+  width: auto;
+}
+.pill[data-tone="dark"] .lockupImg,
+.pill[data-tone="dark"] .markImg {
+  filter: brightness(0) invert(1);
+}
+
+/* ---- centre links ---- */
+.links {
+  --lp: clamp(8px, 0.95vw, 14px);
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--lp);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: inherit;
+}
+/* 1px state underline: wipes in from the left, out to the right */
+.link::after {
+  content: "";
+  position: absolute;
+  left: var(--lp);
+  right: var(--lp);
+  bottom: 9px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s var(--m-ease);
+}
+.link:hover::after,
+.link[aria-current="true"]::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ---- right cluster ---- */
+.actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* EN / 日本語 segmented toggle */
+.seg {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 3px;
+  border-radius: 999px;
+  background-color: rgba(20, 24, 28, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(20, 24, 28, 0.04);
+  transition:
+    background-color var(--tone) var(--m-ease),
+    box-shadow var(--tone) var(--m-ease);
+}
+.seg button {
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--m-soft);
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: 0 0 0 0 rgba(20, 24, 28, 0);
+  transition:
+    color 0.3s var(--m-ease),
+    background-color 0.3s var(--m-ease),
+    box-shadow 0.3s var(--m-ease);
+}
+.seg button:hover {
+  color: var(--m-ink);
+}
+.seg button[aria-pressed="true"] {
+  color: var(--m-ink);
+  background-color: #fff;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.1),
+    0 3px 10px -3px rgba(20, 24, 28, 0.16);
+}
+.pill[data-tone="dark"] .seg {
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+.pill[data-tone="dark"] .seg button {
+  color: var(--m-dark-body);
+}
+.pill[data-tone="dark"] .seg button:hover {
+  color: #fff;
+}
+.pill[data-tone="dark"] .seg button[aria-pressed="true"] {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* dark pill CTA / Menu button that inverts to a white pill on dark glass */
+.btn {
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  transition:
+    transform 0.35s var(--m-ease),
+    color var(--tone) var(--m-ease),
+    box-shadow var(--tone) var(--m-ease);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fff, #eceded);
+  opacity: 0;
+  transition: opacity var(--tone) var(--m-ease);
+}
+.pill[data-tone="dark"] .btn {
+  color: var(--m-ink);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 10px 26px -12px rgba(0, 0, 0, 0.6);
+}
+.pill[data-tone="dark"] .btn::before {
+  opacity: 1;
+}
+.pill[data-tone="dark"] .btn:hover::before {
+  background: #fff;
+}
+/* "Menu" / "Close": a quiet text button with a full 40px hit area */
+.menuBtn {
+  display: none;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: inherit;
+  background-color: rgba(20, 24, 28, 0);
+  transition: background-color 0.3s var(--m-ease);
+}
+.menuBtn:hover {
+  background-color: rgba(20, 24, 28, 0.05);
+}
+.pill[data-tone="dark"] .menuBtn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+:global(html.lang-ja) .menuBtn {
+  font-size: 13px;
+}
+.pill .menuBtn:focus-visible {
+  border-radius: 999px;
+}
+
+/* ---- full-screen menu sheet (phones) ---- */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  color: var(--m-ink);
+  background-color: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  backdrop-filter: blur(28px) saturate(1.2);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.32s var(--m-ease),
+    visibility 0s linear 0.32s;
+}
+.sheet[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.32s var(--m-ease),
+    visibility 0s linear 0s;
+}
+.sheetTop {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+.sheetNav {
+  flex: 1 0 auto;
+  /* 28px = 12px pill inset + 16px pill padding: the list starts on the logo's edge */
+  padding: 28px 28px 32px;
+}
+.sheetList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sheetItem + .sheetItem {
+  border-top: 1px solid var(--m-line);
+}
+.sheetLink {
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px 0;
+  border-radius: 8px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--m-ink);
+}
+:global(html.lang-ja) .sheetLink {
+  letter-spacing: -0.01em;
+}
+.sheetLink[aria-current="true"] > span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+.sheetCta {
+  width: calc(100% - 24px);
+  height: 56px;
+  margin: 0 12px;
+  font-size: 16px;
+}
+.pill .sheetCta:focus-visible,
+.sheet .sheetCta:focus-visible {
+  border-radius: 999px;
+}
+
+/* items rise in a short stagger when the sheet opens; they leave together */
+.rise {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity 0.3s var(--m-ease),
+    transform 0.3s var(--m-ease);
+}
+.sheet[data-open="true"] .rise {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s var(--m-ease),
+    transform 0.7s var(--m-ease);
+  transition-delay: calc(80ms + var(--i, 0) * 40ms);
+}
+
+/* ---- phones ---- */
+@media (max-width: 899px) {
+  .pill {
+    --gut: 16px;
+    display: flex;
+    justify-content: space-between;
+    column-gap: 10px;
+    width: calc(100% - 24px);
+    height: 56px;
+    margin-top: 12px;
+    padding: 0 8px;
+  }
+  .brand {
+    margin-left: calc(var(--gut) - 8px);
+  }
+  .lockup {
+    height: 30px;
+  }
+  .links,
+  .cta {
+    display: none;
+  }
+  .actions {
+    gap: 6px;
+  }
+  .seg {
+    height: 32px;
+  }
+  .seg button {
+    height: 26px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+  .menuBtn {
+    display: inline-flex;
+  }
+}
+/* 360-class phones: a touch tighter so the logo keeps clear air */
+@media (max-width: 399px) {
+  .lockup {
+    height: 28px;
+  }
+  .seg button {
+    padding: 0 8px;
+  }
+  .menuBtn {
+    padding: 0 10px;
+  }
+}
+/* very narrow phones: the V mark stands in for the lockup */
+@media (max-width: 349px) {
+  .lockup {
+    display: none;
+  }
+  .markImg {
+    display: block;
+  }
+}
+@media (min-width: 900px) {
+  .sheet {
+    display: none;
+  }
+}
+
+/* no backdrop blur available: near-solid fills so text never sits on busy content */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pill {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  .pill[data-tone="dark"] {
+    background-color: rgba(26, 28, 31, 0.95);
+  }
+  .sheet {
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill,
+  .pill::before,
+  .pill::after,
+  .lockupImg,
+  .markImg,
+  .link::after,
+  .seg,
+  .seg button,
+  .btn,
+  .btn::before,
+  .menuBtn,
+  .sheet,
+  .sheet[data-open="true"],
+  .rise,
+  .sheet[data-open="true"] .rise {
+    transition: none !important;
+  }
+  .enter {
+    animation: none;
+  }
+  .rise {
+    opacity: 1;
+    transform: none;
+  }
+}

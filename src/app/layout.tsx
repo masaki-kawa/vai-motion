@@ -18,9 +18,9 @@ const notoJp = Noto_Sans_JP({
   display: "swap",
 });
 
-const title = "VAI MOTION — AI video generation";
+const title = "VAI MOTION — Videos and Meta ads for Sydney businesses";
 const description =
-  "AI-made promo videos, finished by a human. Fast, affordable videos for local businesses, SaaS products, and online brands.";
+  "We make short videos from the photos you already have, then run them as Instagram and Facebook ads to people near your shop. No filming. Monthly plans in AUD, cancel anytime.";
 
 export const metadata: Metadata = {
   // set NEXT_PUBLIC_SITE_URL to the real domain in production (falls back to the placeholder)

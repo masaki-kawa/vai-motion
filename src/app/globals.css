@@ -483,3 +483,285 @@ html.lang-ja .hero-title {
     --hp: 1;
   }
 }
+
+/* =========================================================================
+   LP — monochrome liquid glass (the "/" landing page: videos + Meta ads).
+   Black & white only; no accent colour. The /jp route keeps the classes above.
+   ========================================================================= */
+
+:root {
+  --m-ink: #14181c;
+  --m-soft: #4a5058;
+  --m-mute: #6b7179;
+  --m-line: rgba(20, 24, 28, 0.1);
+  --m-paper2: #f4f5f6;
+  --m-night: #0b0d10;
+  --m-dark-body: #c4c8cc;
+  --m-dark-mute: #a7adb3;
+  --m-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.lp ::selection {
+  background: #14181c;
+  color: #fff;
+}
+.lp :focus-visible {
+  outline: 2px solid #14181c;
+  outline-offset: 3px;
+}
+.lp [data-theme="dark"] :focus-visible {
+  outline-color: #fff;
+}
+
+/* ---- type ---- */
+.m-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-mute);
+}
+html.lang-ja .m-kicker {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+[data-theme="dark"] .m-kicker {
+  color: var(--m-dark-mute);
+}
+.m-display {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+html.lang-ja .m-display {
+  letter-spacing: -0.02em;
+}
+/* JA headings: <wbr> hints decide the breaks, never a mid-word wrap or a horizontal scroll */
+html.lang-ja .m-jp-break {
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+.m-body {
+  line-height: 1.7;
+}
+html.lang-ja .m-body {
+  line-height: 1.9;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- glass rims (conic, monochrome) ---- */
+.m-rim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(20, 24, 28, 0.16) 12%,
+    rgba(255, 255, 255, 0.6) 45%,
+    rgba(20, 24, 28, 0.1) 62%,
+    rgba(255, 255, 255, 0.9)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.m-rim-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.04) 75%,
+    rgba(255, 255, 255, 0.28)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* light frosted glass card */
+.m-glass {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(250, 250, 251, 0.6));
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 18px 50px -24px rgba(20, 24, 28, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+/* dark glass card */
+.m-glass-dark {
+  position: relative;
+  color: #fff;
+  background: linear-gradient(180deg, #16191d, #0e1013);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ---- pill buttons ---- */
+.m-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.35s var(--m-ease), background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+.m-btn:hover {
+  transform: translateY(-1px);
+}
+.m-btn:active {
+  transform: scale(0.98);
+}
+.m-btn--dark {
+  color: #fff;
+  background: linear-gradient(180deg, #2a2f35 0%, #14181c 55%, #0d1013 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -2px 6px rgba(0, 0, 0, 0.45),
+    0 10px 24px -10px rgba(20, 24, 28, 0.55);
+}
+.m-btn--dark:hover {
+  background: linear-gradient(180deg, #353b42 0%, #1b2025 55%, #111417 100%);
+}
+.m-btn--light {
+  color: var(--m-ink);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 245, 246, 0.72));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(20, 24, 28, 0.12), 0 8px 22px -12px rgba(20, 24, 28, 0.35);
+}
+.m-btn--light:hover {
+  background: #fff;
+}
+/* white pill on dark sections */
+.m-btn--white {
+  color: var(--m-ink);
+  background: linear-gradient(180deg, #fff, #e9eaeb);
+  box-shadow: inset 0 1px 0 #fff, 0 10px 26px -12px rgba(0, 0, 0, 0.6);
+}
+.m-btn--white:hover {
+  background: #fff;
+}
+.m-btn .m-arrow {
+  transition: transform 0.35s var(--m-ease);
+}
+.m-btn:hover .m-arrow {
+  transform: translateX(3px);
+}
+
+/* ---- image plates ---- */
+.m-plate {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  isolation: isolate;
+}
+.m-plate img {
+  filter: grayscale(1) contrast(1.04);
+}
+/* caption chip on a plate */
+.m-chip {
+  position: absolute;
+  z-index: 3;
+  left: 20px;
+  bottom: 20px;
+  max-width: calc(100% - 40px);
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+.m-chip--light {
+  color: var(--m-ink);
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 10px 30px -14px rgba(20, 24, 28, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.m-chip--dark {
+  color: #fff;
+  background: rgba(16, 18, 21, 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* ---- reveal (one shared IntersectionObserver hook toggles .is-in) ---- */
+.m-reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.9s var(--m-ease), transform 0.9s var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.m-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+/* a heading line rising from behind a mask */
+.m-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+.m-line > span {
+  display: inline-block;
+  transform: translate3d(0, 118%, 0);
+  transition: transform 1s var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.is-in .m-line > span,
+.m-line.is-in > span {
+  transform: none;
+}
+/* plate open: figure clip-path, image settles from 1.06 */
+.m-plate-reveal {
+  clip-path: inset(6% round 28px);
+  transition: clip-path 1.2s var(--m-ease);
+}
+.m-plate-reveal.is-in {
+  clip-path: inset(0 round 28px);
+}
+.m-plate-reveal .m-plate-media {
+  transform: scale(1.06);
+  transition: transform 1.6s var(--m-ease);
+}
+.m-plate-reveal.is-in .m-plate-media {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-reveal,
+  .m-line > span,
+  .m-plate-reveal,
+  .m-plate-reveal .m-plate-media {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+.m-plate-ratio {
+  aspect-ratio: var(--rm);
+}
+@media (min-width: 900px) {
+  .m-plate-ratio {
+    aspect-ratio: var(--r);
+  }
+}

@@ -1,0 +1,123 @@
+/* FAQ — native <details>, a CSS plus that turns to a cross, and a 200ms height + opacity
+   opening where the browser can animate ::details-content. Final states under reduced motion. */
+
+.item {
+  border-bottom: 1px solid var(--m-line);
+  /* lets ::details-content transition between 0 and auto */
+  interpolate-size: allow-keywords;
+}
+
+/* ---- question row ---- */
+.q {
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: padding-bottom 0.2s var(--m-ease);
+}
+/* open: the answer tucks up under its question (the padding returns as it closes) */
+.item[open] .q {
+  padding-bottom: 12px;
+}
+@media (min-width: 900px) {
+  .item[open] .q {
+    padding-bottom: 14px;
+  }
+}
+.q::-webkit-details-marker {
+  display: none;
+}
+.q::marker {
+  content: "";
+}
+
+/* the plus: two 1.5px strokes drawn in CSS, centred in a 32px disc that is only a state
+   surface (paper 2 on hover, ink when open). The whole disc turns 45° into a cross. */
+.icon {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  /* centre the disc on the question's first line (it inherits the summary's line-height) */
+  margin-top: calc((1lh - 32px) / 2);
+  color: var(--m-ink);
+  background: transparent;
+  transition: transform 0.35s var(--m-ease), background-color 0.25s ease, color 0.25s ease;
+}
+.icon::before,
+.icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 1.5px;
+  margin: -0.75px 0 0 -7px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.icon::after {
+  transform: rotate(90deg);
+}
+@media (hover: hover) {
+  .q:hover .icon {
+    background: var(--m-paper2);
+  }
+}
+.item[open] .icon {
+  transform: rotate(45deg);
+  color: #fff;
+  background: var(--m-ink);
+}
+
+/* JA questions and the "ask us" line: keep words whole, break at phrase boundaries where
+   the browser can (auto-phrase); keep-all is the fallback */
+.jaPhrase {
+  word-break: keep-all;
+  word-break: auto-phrase;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+
+/* ---- answer: height + opacity over 200ms ---- */
+@supports selector(::details-content) {
+  .item::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow-y: clip;
+    transition: block-size 0.2s var(--m-ease), opacity 0.2s ease, content-visibility 0.2s allow-discrete;
+  }
+  .item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+/* browsers without ::details-content still get the fade in */
+@supports not selector(::details-content) {
+  .item[open] .a {
+    animation: faqIn 0.2s ease both;
+  }
+}
+@keyframes faqIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .q,
+  .icon {
+    transition: none;
+  }
+  .item::details-content {
+    transition: none !important;
+  }
+  .item[open] .a {
+    animation: none !important;
+  }
+}

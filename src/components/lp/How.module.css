@@ -103,6 +103,24 @@
   }
 }
 
+/* ---- desktop: label, title and body each share one row across the five columns (subgrid
+   through the li and its reveal wrapper), so the bodies start on one line whatever the
+   titles' line counts ---- */
+@media (min-width: 900px) {
+  .steps {
+    grid-template-rows: auto auto 1fr;
+  }
+  .step,
+  .content {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+  }
+  .content {
+    align-content: start;
+  }
+}
+
 /* ---- JA step titles (and FAQ questions): keep words whole. keep-all is the fallback;
    auto-phrase, where supported, breaks at natural phrase boundaries instead of letting
    overflow-wrap split a word at whatever character overflows. ---- */

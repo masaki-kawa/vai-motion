@@ -43,8 +43,3 @@
     animation: none;
   }
 }
-
-/* optical kerning for a line-final full stop (see kernStop) */
-.stop {
-  margin-left: -0.07em;
-}

@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, type CSSProperties } from "react";
 import { useT } from "../LangProvider";
 import Html from "./Html";
 import Plate from "./Plate";
+import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Service.module.css";
 
@@ -328,13 +329,18 @@ function Quote() {
         <p className={`m-kicker m-reveal ${cls}`} style={ja ? { ...delay(100), ...JA_KICKER } : delay(100)}>
           {t("svc.team.label")}
         </p>
-        <p
-          className={`${s.quoteText} m-reveal ${cls} mt-6 font-semibold text-[color:var(--m-ink)] min-[900px]:mt-8`}
-          style={{ ...delay(200), lineHeight: ja ? 1.65 : 1.35, letterSpacing: ja ? "0" : "-0.015em" }}
-        >
-          {/* keep the brand name on one line */}
-          {t("svc.team.quote").replace(/VAI MOTION/g, "VAI MOTION")}
-        </p>
+        {/* JA breaks only at the copy's <wbr> phrase hints; the brand name stays on one line */}
+        <Html
+          as="p"
+          html={t("svc.team.quote").replace(/VAI MOTION/g, "VAI MOTION")}
+          className={`${s.quoteText} ${ja ? `${s.quoteJa} m-jp-break` : ""} m-reveal ${cls} mt-6 font-semibold text-[color:var(--m-ink)] min-[900px]:mt-8`}
+          style={{
+            ...delay(200),
+            lineHeight: ja ? 1.65 : 1.35,
+            letterSpacing: ja ? "0" : "-0.015em",
+            ...(ja ? JA_BREAK : {}),
+          }}
+        />
       </div>
     </div>
   );
@@ -357,23 +363,12 @@ function Label({ text, cls }: { text: string; cls: string }) {
   );
 }
 
-type Part = { word: string } | { sep: "wbr" | "space" };
-
-/** Split a heading into masks: words (EN) or <wbr> phrases (JA), keeping the separators.
- *  Returns null when the copy holds other markup or entities; it then rises as one block. */
-function splitHeading(html: string): Part[] | null {
-  if (/<(?!wbr\b)[a-z]/i.test(html) || /&[#a-z0-9]+;/i.test(html)) return null;
-  return html
-    .split(/(<wbr\s*\/?>|\s+)/i)
-    .filter(Boolean)
-    .map((p): Part => (/^<wbr/i.test(p) ? { sep: "wbr" } : /^\s+$/.test(p) ? { sep: "space" } : { word: p }));
-}
-
 /**
- * A heading whose rendered lines rise from behind a mask, 80ms apart. Each word (EN) or
- * phrase (JA) is its own mask, so the heading keeps its natural, balanced wrapping; the
- * effect finds the line each mask landed on and sets its delay, and publishes the end of
- * the last line as --after on the parent so the copy below can follow it.
+ * A heading whose rendered lines rise from behind a mask, 80ms apart. Each word (EN, with
+ * one/two-letter words bound to the next and a final "." or "?" kerned) or phrase (JA) is its
+ * own mask, so the heading keeps its natural, balanced wrapping; the effect finds the line each
+ * mask landed on and sets its delay, and publishes the end of the last line as --after on the
+ * parent so the copy below can follow it.
  */
 function Rise({
   as: Tag,
@@ -426,7 +421,7 @@ function Rise({
     return (
       <Tag ref={ref} id={id} className={`${className} ${cls}`} style={style}>
         <span className="m-line">
-          <Html html={html} style={delay(80)} />
+          <Html html={kernHtml(bindShortWords(html))} style={delay(80)} />
         </span>
       </Tag>
     );
@@ -439,7 +434,7 @@ function Rise({
         {parts.map((p, i) =>
           "word" in p ? (
             <span key={i} data-w="" className={`m-line ${s.word}`}>
-              <span>{p.word}</span>
+              <span>{kernWord(p.word)}</span>
             </span>
           ) : p.sep === "wbr" ? (
             <wbr key={i} />

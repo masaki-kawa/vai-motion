@@ -171,6 +171,11 @@
     font-size: clamp(24px, 2.8vw, 40px);
     text-wrap: balance;
   }
+  /* JA: a narrower measure, so balance sets short <wbr> phrase lines instead of four full ones */
+  .quoteJa {
+    max-width: 22em;
+    margin-inline: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

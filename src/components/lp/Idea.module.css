@@ -40,17 +40,6 @@
   transform: none;
 }
 
-/* ---- reading focus (desktop only, never under reduced motion): only the claim
-   sentence of the blocks not being read eases back to .5 (large text, ~3.5:1) ---- */
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-  .list[data-dim] .claim {
-    transition: opacity 0.4s ease;
-  }
-  .list[data-dim] [data-claim]:not([data-on]) .claim {
-    opacity: 0.5;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .title .word > span,
   .rule {

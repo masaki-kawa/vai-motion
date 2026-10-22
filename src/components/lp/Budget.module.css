@@ -22,11 +22,8 @@
 .mask > span {
   display: inline-block;
 }
-.stop {
-  margin-left: -0.07em;
-}
 
-/* ---- big number row: number left, caption right on its last baseline (desktop) ---- */
+/* ---- big number row: number left, caption right beside it on its last baseline (desktop) ---- */
 .bigRow {
   display: flex;
   flex-direction: column;
@@ -36,7 +33,7 @@
 @media (min-width: 900px) {
   .bigRow {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     column-gap: 48px;
     align-items: flex-end;
     align-items: last baseline;
@@ -47,7 +44,7 @@
 }
 @media (min-width: 900px) {
   .caption {
-    flex: 0 1 18em;
+    flex: 0 1 20em;
   }
 }
 
@@ -65,11 +62,7 @@
   letter-spacing: -0.05em;
 }
 .num > span {
-  grid-area: 1 / 1;
   white-space: nowrap;
-}
-.ghost {
-  visibility: hidden;
 }
 /* "$" / "A$" as a small superior sign, its top level with the figures' cap height
    (Jakarta caps ≈ .72em): raise = .72em × (1 − k) / k in the sign's own em */
@@ -260,6 +253,19 @@
   transition: transform 1s var(--m-ease) var(--d, 0ms);
 }
 
+/* the big number rises inside its own box, like the heading masks. clip-path, not
+   overflow:hidden, so the row's last-baseline alignment with the caption is untouched */
+.armed .num {
+  clip-path: inset(-0.2em -0.2em 0 -0.2em);
+}
+.armed .num > span {
+  transform: translate3d(0, 110%, 0);
+}
+.armed :global(.is-in) .num > span {
+  transform: none;
+  transition: transform 1s var(--m-ease) var(--d, 0ms);
+}
+
 .armed .fill {
   clip-path: inset(0 100% 0 0 round var(--r));
 }
@@ -280,6 +286,8 @@
 @media (prefers-reduced-motion: reduce) {
   .armed .rise,
   .armed .mask > span,
+  .armed .num,
+  .armed .num > span,
   .armed .fill,
   .armed .later {
     opacity: 1 !important;

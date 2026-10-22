@@ -99,12 +99,6 @@
   transform: none;
 }
 
-/* optical kerning: Jakarta's full stop carries ~.12em of side bearing, which reads as a gap
-   after tight display tracking (EN H2 only; JA ends in 「。」) */
-.stop {
-  margin-left: -0.07em;
-}
-
 /* JA headings with <wbr> hints: keep-all so the hints decide the breaks, and phrase-aware
    breaking where the browser has it, so a phrase wider than a phone column splits between
    words, never mid-word */

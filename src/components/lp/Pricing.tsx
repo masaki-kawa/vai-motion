@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, type CSSProperties } from "react";
 import { useT } from "../LangProvider";
 import Html from "./Html";
 import Plate from "./Plate";
+import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Pricing.module.css";
 
@@ -95,12 +96,6 @@ function splitLead(str: string) {
   return m ? { lead: str.slice(0, m.index + 1), total: str.slice(m.index + m[0].length) } : { lead: "", total: str };
 }
 
-/** JA panel title: 「Metaへ直接お支払いいただきます。」 is wider than a phone column, so it needs a
- *  second break hint after 「直接」 (requested for the dictionary; a no-op once it is there). */
-function spendTitleJa(html: string) {
-  return html.replace(/直接(?!<wbr)お/, "直接<wbr>お");
-}
-
 export default function Pricing() {
   const { t, cur } = useT();
   const ja = cur === "ja";
@@ -139,11 +134,12 @@ export default function Pricing() {
         <div className="mt-16 min-[900px]:mt-24">
           <GroupLabel />
 
-          {/* Light | Growth on desktop; Growth + Ads leads on phones. The dark card stands 48px
+          {/* Growth + Ads leads in the DOM, so phones read and tab it first as they show it; from
+              900px both cards are placed in row 1, Light | Growth. The dark card stands 48px
               taller (its Recommended row), so names, prices and CTAs line up across the pair. */}
           <div className="mt-6 grid gap-5 min-[900px]:mt-8 min-[900px]:grid-cols-2 min-[900px]:gap-8">
-            <PlanCard kind="la" />
             <PlanCard kind="ga" />
+            <PlanCard kind="la" />
           </div>
 
           <Included />
@@ -202,12 +198,12 @@ function PlanCard({ kind }: { kind: "la" | "ga" }) {
     <article
       ref={ref}
       aria-labelledby={nameId}
-      // dark tokens (white focus ring, light kicker) inside this card only; the nav reads sections
+      // dark tokens (white focus ring, light kicker) inside this card; the nav also turns dark over it
       data-theme={dark ? "dark" : undefined}
       className={`m-reveal ${cls} flex flex-col rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:p-10 ${
         dark
-          ? `m-glass-dark m-rim-dark ${s.dark} ${s.lag} order-first min-[900px]:order-none`
-          : "m-glass m-rim min-[900px]:mt-12"
+          ? `m-glass-dark m-rim-dark ${s.dark} ${s.lag} min-[900px]:col-start-2 min-[900px]:row-start-1`
+          : "m-glass m-rim min-[900px]:col-start-1 min-[900px]:row-start-1 min-[900px]:mt-12"
       }`}
     >
       <h4
@@ -278,30 +274,40 @@ function PlanCard({ kind }: { kind: "la" | "ga" }) {
   );
 }
 
-/** "Both plans include": Videos and Ads, side by side from 640px */
+/** "Both plans include": Videos and Ads, side by side from 640px, then what is not included */
 function Included() {
   const { t, cur } = useT();
+  const ja = cur === "ja";
   const { ref, cls } = useReveal<HTMLDivElement>();
   const videos = ["v1", "v2", "v3", "v4"].map((k) => t(`pr.incl.${k}`));
   const ads = ["a1", "a2", "a3", "a4", "a5"].map((k) => t(`pr.incl.${k}`));
 
   return (
-    <div
-      ref={ref}
-      className={`m-glass m-rim m-reveal ${cls} mt-5 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-8 min-[900px]:p-10`}
-    >
-      <h4
-        className={`text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-[color:var(--m-ink)] ${
-          cur === "ja" ? s.jaLabel : ""
-        }`}
+    <>
+      <div
+        ref={ref}
+        className={`m-glass m-rim m-reveal ${cls} mt-5 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-8 min-[900px]:p-10`}
       >
-        {t("pr.incl.title")}
-      </h4>
-      <div className="mt-7 grid gap-y-9 min-[640px]:grid-cols-2 min-[640px]:gap-x-10 min-[900px]:mt-8 min-[1100px]:gap-x-14">
-        <IncludedList title={t("pr.incl.videos")} items={videos} lead={150} />
-        <IncludedList title={t("pr.incl.ads")} items={ads} lead={270} />
+        <h4
+          className={`text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-[color:var(--m-ink)] ${
+            ja ? s.jaLabel : ""
+          }`}
+        >
+          {t("pr.incl.title")}
+        </h4>
+        <div className="mt-7 grid gap-y-9 min-[640px]:grid-cols-2 min-[640px]:gap-x-10 min-[900px]:mt-8 min-[1100px]:gap-x-14">
+          <IncludedList title={t("pr.incl.videos")} items={videos} lead={150} />
+          <IncludedList title={t("pr.incl.ads")} items={ads} lead={270} />
+        </div>
       </div>
-    </div>
+      {/* under the card, inset to its text column; revealed with it */}
+      <p
+        className={`m-reveal ${cls} mt-4 max-w-[48em] px-5 text-[14px] text-[color:var(--m-mute)] [text-wrap:pretty] sm:px-8 min-[900px]:px-10`}
+        style={{ ...delay(200), lineHeight: ja ? 1.8 : 1.6 }}
+      >
+        {t("pr.incl.not")}
+      </p>
+    </>
   );
 }
 
@@ -347,14 +353,14 @@ function Spend() {
       <span aria-hidden="true" className={s.rule} />
 
       <div className="min-[900px]:col-span-7">
-        {/* Html renders the <wbr> hint (it has no h4 option, so it fills the heading as a span) */}
+        {/* Html renders the <wbr> hints and the kerned stops (it has no h4 option, so it fills the heading as a span) */}
         <h4
           className={`font-bold text-[color:var(--m-ink)] [text-wrap:balance] text-[22px] sm:text-[24px] min-[900px]:text-[26px] ${
             ja ? s.jaHead : ""
           }`}
           style={{ lineHeight: ja ? 1.5 : 1.2, letterSpacing: ja ? "-0.01em" : "-0.02em" }}
         >
-          <Html html={ja ? spendTitleJa(t("pr.spend.title")) : t("pr.spend.title")} />
+          <Html html={kernHtml(bindShortWords(t("pr.spend.title")))} />
         </h4>
         <p
           className="mt-5 max-w-[38em] text-[16px] text-[color:var(--m-soft)] [text-wrap:pretty]"
@@ -557,22 +563,6 @@ function FootNote() {
 
 /* ------------------------------------------------------------------------- */
 
-type Part = { word: string } | { sep: "wbr" | "space" };
-
-/** Split a heading into masks: words (EN) or <wbr> phrases (JA), keeping the separators.
- *  A one- or two-letter EN word travels with the next one. Returns null when the copy holds
- *  other markup or entities; it then rises as one block. */
-function splitHeading(html: string): Part[] | null {
-  if (/<(?!wbr\b)[a-z]/i.test(html) || /&[#a-z0-9]+;/i.test(html)) return null;
-  const bound = html.replace(/(^|\s)([A-Za-z]{1,2}) +(?=\S)/g, "$1$2 ");
-  return bound
-    .split(/(<wbr\s*\/?>|[^\S ]+)/i)
-    .filter(Boolean)
-    .map((p): Part =>
-      /^<wbr/i.test(p) ? { sep: "wbr" } : /^[^\S ]+$/.test(p) ? { sep: "space" } : { word: p },
-    );
-}
-
 /**
  * A heading whose rendered lines rise from behind a mask, 80ms apart. Each word (EN) or
  * phrase (JA) is its own mask, so the heading keeps its natural, balanced wrapping; the
@@ -630,7 +620,7 @@ function Rise({
     return (
       <Tag ref={ref} id={id} className={`${className} ${cls}`} style={style}>
         <span className="m-line">
-          <Html html={html} style={delay(80)} />
+          <Html html={kernHtml(bindShortWords(html))} style={delay(80)} />
         </span>
       </Tag>
     );
@@ -643,17 +633,7 @@ function Rise({
         {parts.map((p, i) =>
           "word" in p ? (
             <span key={i} data-w="" className={`m-line ${s.word}`}>
-              <span>
-                {/* optical kerning: pull a word-final full stop in (EN; JA ends in 「。」) */}
-                {p.word.endsWith(".") ? (
-                  <>
-                    {p.word.slice(0, -1)}
-                    <span className={s.stop}>.</span>
-                  </>
-                ) : (
-                  p.word
-                )}
-              </span>
+              <span>{kernWord(p.word)}</span>
             </span>
           ) : p.sep === "wbr" ? (
             <wbr key={i} />

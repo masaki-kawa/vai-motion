@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { Lang } from "@/lib/i18n";
 import { useT } from "../LangProvider";
 import Html from "./Html";
+import { kernHtml } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Footer.module.css";
 
@@ -30,10 +31,6 @@ const PENDING: Record<string, Record<Lang, string>> = {
   "ft.nav": { en: "Footer", ja: "フッター" },
 };
 
-/** Optical kerning: Jakarta's full stop carries ~.12em of side bearing, which reads as a gap
- *  after tight display tracking. Pull a line-final "." in (EN only; JA ends in 「。」). */
-const kernStop = (html: string) => html.replace(/\.$/, `<span class="${s.stop}">.</span>`);
-
 export default function Footer() {
   const { t, cur, setLang } = useT();
   const ja = cur === "ja";
@@ -46,7 +43,7 @@ export default function Footer() {
     .split(/<br\s*\/?>/i)
     .map((l) => l.trim())
     .filter(Boolean)
-    .map(kernStop);
+    .map(kernHtml); // pull a final "." in (EN only; JA ends in 「。」)
 
   return (
     <footer id="footer" className={`bg-white pt-[88px] min-[900px]:pt-[120px] ${s.footer}`}>

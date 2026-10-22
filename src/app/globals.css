@@ -24,8 +24,14 @@ html.lang-ja [data-i18n-html] {
   word-break: keep-all;
   line-break: strict;
 }
-section[id] {
-  scroll-margin-top: 110px;
+/* anchor targets (SmoothScroll and native) and keyboard focus land clear of the fixed nav */
+html {
+  scroll-padding-top: 110px;
+}
+/* SmoothScroll focuses a <main>/<section> anchor target (tabindex=-1): no ring around a whole section */
+main[tabindex="-1"]:focus,
+section[tabindex="-1"]:focus {
+  outline: none;
 }
 
 /* hero background: pure white + one faint cloud low-left only */
@@ -512,6 +518,12 @@ html.lang-ja .hero-title {
 .lp [data-theme="dark"] :focus-visible {
   outline-color: #fff;
 }
+/* phones: keyboard focus never stops under the fixed MobileBar (12px inset + 60px pill) */
+@media (max-width: 899px) {
+  html:has(.lp) {
+    scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
 
 /* ---- type ---- */
 .m-kicker {
@@ -548,6 +560,18 @@ html.lang-ja .m-jp-break {
 }
 html.lang-ja .m-body {
   line-height: 1.9;
+}
+/* JA running text (leads, body, list items, captions): no small kana starting a line, and
+   phrase-aware breaking where the browser has it. Zero specificity, so any heading that sets
+   its own breaking (keep-all + <wbr> via .m-jp-break, inline styles, module classes) wins. */
+:where(html.lang-ja .lp) :where(p, li, dd, figcaption) {
+  line-break: strict;
+}
+@supports (word-break: auto-phrase) {
+  :where(html.lang-ja .lp) :where(p, li, dd, figcaption) {
+    word-break: auto-phrase;
+    overflow-wrap: anywhere;
+  }
 }
 .tabular {
   font-variant-numeric: tabular-nums;
@@ -764,4 +788,11 @@ html.lang-ja .m-body {
   .m-plate-ratio {
     aspect-ratio: var(--r);
   }
+}
+/* display punctuation: Plus Jakarta's "." and "?" sit too far from the word at tight tracking */
+.m-stop {
+  margin-left: -0.07em;
+}
+.m-q {
+  margin-left: -0.05em;
 }

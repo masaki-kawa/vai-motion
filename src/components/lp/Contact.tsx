@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode, type Ref } from "react";
 import { useT } from "../LangProvider";
+import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Contact.module.css";
 
@@ -86,7 +87,9 @@ export default function Contact() {
   };
   const ja = cur === "ja";
   const head = useReveal<HTMLDivElement>();
-  const cardIn = useReveal<HTMLDivElement>(0.12);
+  /* threshold 0: the card is taller than a phone screen, and a CTA landing on #contact can leave
+     only its top edge in view; any fraction must reveal it, or the form stays invisible there */
+  const cardIn = useReveal<HTMLDivElement>(0);
   const next = useReveal<HTMLDivElement>();
 
   const [v, setV] = useState<Values>(EMPTY);
@@ -210,9 +213,12 @@ export default function Contact() {
   const done = status === "ok";
   const sending = status === "sending";
 
-  /** "Required" is already conveyed by the input's `required`, so only "Optional" is read out */
+  /** "Required" is already conveyed by the input's `required`, so only "Optional" is read out.
+      The hidden ", " keeps the accessible name apart ("Plan, Optional"): a plain space between the
+      label text and this span gets dropped from the name, and the .tag margin draws the gap. */
   const tag = (required: boolean) => (
     <span className={s.tag} aria-hidden={required || undefined}>
+      <span className="sr-only">, </span>
       {t(required ? "ct.required" : "ct.optional")}
     </span>
   );
@@ -278,7 +284,7 @@ export default function Contact() {
                     {/* plan */}
                     <div className={`${s.field} ${s.full}`}>
                       <label htmlFor="ct-plan" className={s.label}>
-                        {t("ct.plan")}{" "}
+                        {t("ct.plan")}
                         {tag(false)}
                       </label>
                       <Select
@@ -309,7 +315,7 @@ export default function Contact() {
                     {/* name */}
                     <div className={s.field}>
                       <label htmlFor="ct-name" className={s.label}>
-                        {t("ct.name")}{" "}
+                        {t("ct.name")}
                         {tag(true)}
                       </label>
                       <input
@@ -339,7 +345,7 @@ export default function Contact() {
                     {/* email */}
                     <div className={s.field}>
                       <label htmlFor="ct-email" className={s.label}>
-                        {t("ct.email")}{" "}
+                        {t("ct.email")}
                         {tag(true)}
                       </label>
                       <input
@@ -375,7 +381,7 @@ export default function Contact() {
                     {/* business */}
                     <div className={s.field}>
                       <label htmlFor="ct-business" className={s.label}>
-                        {t("ct.biz")}{" "}
+                        {t("ct.biz")}
                         {tag(false)}
                       </label>
                       <input
@@ -393,7 +399,7 @@ export default function Contact() {
                     {/* type of business */}
                     <div className={s.field}>
                       <label htmlFor="ct-industry" className={s.label}>
-                        {t("ct.ind")}{" "}
+                        {t("ct.ind")}
                         {tag(false)}
                       </label>
                       <Select id="ct-industry" name="industry" value={v.industry} onChange={(val) => set("industry", val)}>
@@ -412,7 +418,7 @@ export default function Contact() {
                     {asksHandle(v.plan) ? (
                       <div className={`${s.field} ${s.full} ${s.enter}`}>
                         <label htmlFor="ct-social" className={s.label}>
-                          {t("ct.handle")}{" "}
+                          {t("ct.handle")}
                           {tag(false)}
                         </label>
                         <input
@@ -436,7 +442,7 @@ export default function Contact() {
                       <>
                         <div className={`${s.field} ${s.full} ${s.enter}`}>
                           <label htmlFor="ct-budget" className={s.label}>
-                            {t("ct.budget")}{" "}
+                            {t("ct.budget")}
                             {tag(false)}
                           </label>
                           <Select
@@ -462,7 +468,7 @@ export default function Contact() {
 
                         <fieldset className={`${s.field} ${s.full} ${s.enter}`}>
                           <legend className={`${s.label} ${s.legend}`}>
-                            {t("ct.adsBefore")}{" "}
+                            {t("ct.adsBefore")}
                             {tag(false)}
                           </legend>
                           <div className={s.seg} data-v={v.ads_before || undefined}>
@@ -488,7 +494,7 @@ export default function Contact() {
                     {/* message */}
                     <div className={`${s.field} ${s.full}`}>
                       <label htmlFor="ct-message" className={s.label}>
-                        {t("ct.msg")}{" "}
+                        {t("ct.msg")}
                         {tag(false)}
                       </label>
                       <textarea
@@ -570,17 +576,6 @@ export default function Contact() {
 /* ---- H2: one mask per word (EN) or <wbr> phrase (JA), so the heading keeps its natural,
    balanced wrapping; each rendered line rises 80ms after the one above ---- */
 
-type Part = { word: string } | { sep: "wbr" | "space" };
-
-/** null when the copy holds markup other than <wbr>; it then rises as one block */
-function splitTitle(html: string): Part[] | null {
-  if (/<(?!wbr\b)[a-z]/i.test(html)) return null;
-  return html
-    .split(/(<wbr\s*\/?>|\s+)/i)
-    .filter(Boolean)
-    .map((p): Part => (/^<wbr/i.test(p) ? { sep: "wbr" } : /^\s+$/.test(p) ? { sep: "space" } : { word: p }));
-}
-
 function Title({
   id,
   html,
@@ -596,7 +591,8 @@ function Title({
   style?: CSSProperties;
 }) {
   const ref = useRef<HTMLHeadingElement>(null);
-  const parts = splitTitle(html);
+  /* null when the copy holds markup other than <wbr>; it then rises as one block */
+  const parts = splitHeading(html);
   const text = html.replace(/<[^>]+>/g, "");
 
   // Find the line each mask landed on and stagger by it; re-measured on resize and once the
@@ -638,15 +634,7 @@ function Title({
             {parts.map((p, i) =>
               "word" in p ? (
                 <span key={i} data-w="" className={`m-line ${s.word}`}>
-                  {/* optical kerning: pull an EN heading-final full stop in (JA ends in 「。」) */}
-                  {i === parts.length - 1 && /[^.]\.$/.test(p.word) ? (
-                    <span>
-                      {p.word.slice(0, -1)}
-                      <span className={s.stop}>.</span>
-                    </span>
-                  ) : (
-                    <span>{p.word}</span>
-                  )}
+                  <span>{kernWord(p.word)}</span>
                 </span>
               ) : p.sep === "wbr" ? (
                 <wbr key={i} />
@@ -658,7 +646,7 @@ function Title({
         </>
       ) : (
         <span className="m-line">
-          <span dangerouslySetInnerHTML={{ __html: html }} style={delay(80)} />
+          <span dangerouslySetInnerHTML={{ __html: kernHtml(bindShortWords(html)) }} style={delay(80)} />
         </span>
       )}
     </h2>

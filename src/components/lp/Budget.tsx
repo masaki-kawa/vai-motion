@@ -5,6 +5,7 @@ import { useT } from "../LangProvider";
 import { DERIVED, PRICING, money } from "@/lib/pricing";
 import type { Lang } from "@/lib/i18n";
 import Html from "./Html";
+import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Budget.module.css";
 
@@ -12,7 +13,7 @@ import s from "./Budget.module.css";
 const FILL_MS = 900; // each bar fill wipes in over 900ms
 const SEG2_LAG = 200; // Row B segment 2 starts 200ms after segment 1
 const LABEL_LAG = FILL_MS + 250; // labels fade in 250ms after their fill lands
-const COUNT_MS = 900; // the big number counts up 0 → exSpend
+const NUM_LAG = 120; // the big number rises 120ms after its row is revealed
 
 /* ---- bar geometry, straight from the pricing constants ---- */
 const BUDGET = PRICING.example.budget;
@@ -29,22 +30,6 @@ const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 const JA_BREAK: CSSProperties = { wordBreak: "keep-all", lineBreak: "strict", overflowWrap: "anywhere" };
 /** JA prose: wrap at phrase boundaries where the browser can (Chrome), normal breaking elsewhere */
 const JA_PHRASE: CSSProperties = { wordBreak: "auto-phrase", overflowWrap: "anywhere" };
-
-/** The H2 split into masks: words (EN) or <wbr> phrases (JA), keeping the separators.
- *  Returns null when the copy holds other markup, which then rises as a single block. */
-type TitlePart = { word: string } | { sep: "wbr" | "space" };
-
-function splitTitle(html: string): TitlePart[] | null {
-  if (/<(?!wbr\b)[a-z]/i.test(html)) return null;
-  // EN: a one- or two-letter word ("a", "of") never ends a line; it travels with the next word
-  const bound = html.replace(/(^|\s)([A-Za-z]{1,2}) +(?=\S)/g, "$1$2\u00a0");
-  return bound
-    .split(/(<wbr\s*\/?>|[^\S\u00a0]+)/i) // whitespace, but not the no-break space just added
-    .filter(Boolean)
-    .map((p): TitlePart =>
-      /^<wbr/i.test(p) ? { sep: "wbr" } : /^[^\S\u00a0]+$/.test(p) ? { sep: "space" } : { word: p },
-    );
-}
 
 /** "VAI MOTION fee $700 · 4 videos and ad management" → main line + quieter detail line */
 function splitSeg(label: string) {
@@ -87,7 +72,8 @@ export default function Budget() {
   }, []);
 
   const titleHtml = t("bud.title");
-  const parts = splitTitle(titleHtml);
+  // masks: words (EN) or <wbr> phrases (JA); null when the copy holds other markup
+  const parts = splitHeading(titleHtml);
   const titleText = titleHtml.replace(/<[^>]+>/g, "");
 
   // Heading lines rise 80ms apart: find the line each mask landed on and stagger by it.
@@ -167,15 +153,7 @@ export default function Budget() {
                     {parts.map((p, i) =>
                       "word" in p ? (
                         <span key={i} data-w="" className={s.mask}>
-                          {/* optical kerning: pull a heading-final full stop in (EN; JA ends in 「。」) */}
-                          {i === parts.length - 1 && /[^.]\.$/.test(p.word) ? (
-                            <span>
-                              {p.word.slice(0, -1)}
-                              <span className={s.stop}>.</span>
-                            </span>
-                          ) : (
-                            <span>{p.word}</span>
-                          )}
+                          <span>{kernWord(p.word)}</span>
                         </span>
                       ) : p.sep === "wbr" ? (
                         <wbr key={i} />
@@ -187,7 +165,7 @@ export default function Budget() {
                 </>
               ) : (
                 <span className={s.mask}>
-                  <Html html={titleHtml} style={delay(80)} />
+                  <Html html={kernHtml(bindShortWords(titleHtml))} style={delay(80)} />
                 </span>
               )}
             </h2>
@@ -195,11 +173,11 @@ export default function Budget() {
         </div>
 
         {/* ---- the big number and its caption: one <p>, so they can never separate ---- */}
-        <p ref={big.ref} className={`mt-12 min-[900px]:mt-20 ${s.bigRow}`}>
-          <BigNumber to={SPEND} run={big.inView} armed={armed} cur={cur} />
+        <p ref={big.ref} className={`mt-12 min-[900px]:mt-20 ${s.bigRow} ${big.cls}`}>
+          <BigNumber value={SPEND} cur={cur} />
           <span className="sr-only">{`${t("bud.big")} `}</span>
           <span
-            className={`max-w-[18em] text-[18px] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:text-[20px] ${s.caption}`}
+            className={`max-w-[18em] text-[18px] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:max-w-[20em] min-[900px]:text-[20px] ${s.caption}`}
             style={{ lineHeight: ja ? 1.75 : 1.5, ...(ja ? JA_PHRASE : {}) }}
           >
             {t("bud.big.caption")}
@@ -241,38 +219,12 @@ export default function Budget() {
   );
 }
 
-/** The ad-spend number: counts 0 → `to` in rAF once revealed (armed only); otherwise final. */
-function BigNumber({ to, run, armed, cur }: { to: number; run: boolean; armed: boolean; cur: Lang }) {
-  const [n, setN] = useState(0);
-
-  useEffect(() => {
-    if (!armed || !run) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setN(to);
-      return;
-    }
-    let raf = 0;
-    let t0 = 0;
-    const tick = (now: number) => {
-      if (!t0) t0 = now;
-      const p = Math.min(1, (now - t0) / COUNT_MS);
-      setN(Math.round(to * (1 - Math.pow(1 - p, 3)))); // ease-out cubic
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [armed, run, to]);
-
-  const shown = armed ? (run ? n : 0) : to;
-
+/** The ad-spend number, always the real amount. When armed it rises in its own mask with the row. */
+function BigNumber({ value, cur }: { value: number; cur: Lang }) {
   return (
-    // the final value sits underneath, invisible, so the count never reflows the row
     <span aria-hidden="true" className={`tabular font-extrabold text-white ${s.num}`}>
-      <span className={s.ghost}>
-        <Amount value={to} cur={cur} />
-      </span>
-      <span>
-        <Amount value={shown} cur={cur} />
+      <span style={delay(NUM_LAG)}>
+        <Amount value={value} cur={cur} />
       </span>
     </span>
   );

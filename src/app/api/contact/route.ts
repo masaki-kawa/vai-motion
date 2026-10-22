@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { I18N_JP } from "@/lib/i18n.jp";
 import { DERIVED, PRICING, money } from "@/lib/pricing";
 
 export const runtime = "nodejs";
@@ -33,8 +34,16 @@ const PLAN_LABEL: Record<string, string> = {
   promo: `One-off promo video (from ${money(PRICING.promo.short, "en")})`,
   undecided: "Not sure yet",
 };
-// The old /jp page still posts its Growth plan as "std".
-PLAN_LABEL.std = PLAN_LABEL.growth;
+
+/** The old /jp page posts light | std | promo | undecided and prices them in yen, tax included:
+ *  its labels come from the /jp dictionary, so Slack shows what that page showed. */
+const jp = I18N_JP.en;
+const JP_PLAN_LABEL: Record<string, string> = {
+  light: `/jp ${jp["pr.light.name"]} — ${jp["pr.light.price"]}${jp["pr.light.per"]}`,
+  std: `/jp ${jp["pr.std.name"]} — ${jp["pr.std.price"]}${jp["pr.std.per"]}`,
+  promo: `/jp one-off promo (from ${jp["promo.1.price"]}, tax incl.)`,
+  undecided: "Not sure yet",
+};
 
 /** "/" posts stable English keys; /jp posts its translated labels, which pass through as-is. */
 const INDUSTRY_LABEL: Record<string, string> = {
@@ -98,7 +107,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
   }
 
-  const plan = label(PLAN_LABEL, str(data.plan)) || "—";
+  const fromJp = data.post !== undefined; // only the legacy /jp form sends `post`
+  const plan = label(fromJp ? JP_PLAN_LABEL : PLAN_LABEL, str(data.plan)) || "—";
   const field = (title: string, value?: string) => ({
     type: "mrkdwn" as const,
     text: `*${title}:*\n${esc(clip((value ?? "").trim(), 1800) || "—")}`,
@@ -118,13 +128,15 @@ export async function POST(req: Request) {
   if (data.post !== undefined) fields.push(field("Wants posting", label(YES_NO, str(data.post))));
   const lang = str(data.lang);
   if (lang) fields.push(field("Language", label(LANG_LABEL, lang)));
+  fields.push(field("Page", fromJp ? "/jp (JPY, tax incl.)" : "/ (AUD)"));
 
   const blocks: unknown[] = [
     {
       type: "header",
       text: { type: "plain_text", text: clip(`New enquiry — ${name}`, 150), emoji: true },
     },
-    // a section block holds at most 10 fields; this one holds 9 at most
+    // a section block holds at most 10 fields: "/" sends 9 at most, /jp 7, and even a payload
+    // carrying every optional key stops at 10
     { type: "section", fields },
   ];
   const message = str(data.message);

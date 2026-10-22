@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     title,
     description,
     url: "/",
-    images: [{ url: "/og.jpg?v=2", width: 1200, height: 630, alt: "VAI MOTION" }],
+    images: [{ url: "/og-lp.jpg?v=1", width: 1200, height: 630, alt: "VAI MOTION" }],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/og.jpg?v=2"],
+    images: ["/og-lp.jpg?v=1"],
   },
   icons: {
     icon: "/assets/vai-mark.png",
@@ -53,14 +53,17 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // render the right language server-side (from the cookie) so there is no flash for returning visitors
+  // render the right language server-side (from the cookie) so there is no flash for returning visitors.
+  // A page whose ?lang= differs from the cookie corrects lang/.lang-ja before first paint with a
+  // tiny inline script (see app/page.tsx), hence suppressHydrationWarning.
   const store = await cookies();
   const lang = normalizeLang(store.get(LANG_COOKIE)?.value) ?? "en";
 
   return (
     <html
       lang={lang}
-      className={`scroll-smooth ${jakarta.variable} ${notoJp.variable} ${
+      suppressHydrationWarning
+      className={`motion-safe:scroll-smooth ${jakarta.variable} ${notoJp.variable} ${
         lang === "ja" ? "lang-ja" : ""
       }`}
     >

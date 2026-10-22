@@ -19,7 +19,8 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 
 /**
  * Floating monochrome glass pill. Light frosted glass by default; switches to dark glass
- * while the pill overlaps a section[data-theme="dark"]. Below 900px the links move into a
+ * while the pill overlaps any [data-theme="dark"] element (a dark section, or the dark
+ * Growth + Ads card even where it covers only part of the pill). Below 900px the links move into a
  * full-screen frosted sheet (focus trapped, Esc closes) and the CTA hands over to MobileBar.
  */
 export default function Nav() {
@@ -41,7 +42,9 @@ export default function Nav() {
     return v === key ? (cur === "ja" ? ja : en) : v;
   };
 
-  // ---- tone: dark glass while the pill's own band overlaps a dark section ----
+  // ---- tone: dark glass while the pill's own band overlaps any dark element ----
+  // Any overlap, not a majority: light glass over a dark card turns grey and the small
+  // toggle text drops below 4.5:1, while dark glass keeps white text >= 5.7:1 over white.
   useEffect(() => {
     const pill = pillRef.current;
     if (!pill) return;
@@ -67,7 +70,7 @@ export default function Nav() {
         },
         { rootMargin: `-${top}px 0px -${bottom}px 0px` },
       );
-      document.querySelectorAll('section[data-theme="dark"]').forEach((el) => io!.observe(el));
+      document.querySelectorAll('[data-theme="dark"]').forEach((el) => io!.observe(el));
     };
     const onResize = () => {
       if (!raf) raf = requestAnimationFrame(build);

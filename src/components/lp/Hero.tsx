@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { useT } from "../LangProvider";
 import Html from "./Html";
 import Plate from "./Plate";
+import { kernHtml } from "./typeset";
 import s from "./Hero.module.css";
 
 /** plate alt text (spec › Images › hero.jpg) */
@@ -17,10 +18,6 @@ const FACTS = ["fact1", "fact2", "fact3", "fact4"] as const;
 /** stagger delay as a CSS custom property */
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 
-/** Optical kerning: Jakarta's full stop carries ~.12em of side bearing, which reads as a gap
- *  after tight display tracking. Pull a line-final "." in (EN only; JA ends in 「。」). */
-const kernStop = (html: string) => html.replace(/\.$/, `<span class="${s.stop}">.</span>`);
-
 export default function Hero() {
   const { t, cur } = useT();
   const ja = cur === "ja";
@@ -28,7 +25,7 @@ export default function Hero() {
     .split(/<br\s*\/?>/i)
     .map((l) => l.trim())
     .filter(Boolean)
-    .map(kernStop);
+    .map(kernHtml); // pull a final "." in (EN only; JA ends in 「。」)
 
   return (
     // no id: <main id="top"> wraps the page

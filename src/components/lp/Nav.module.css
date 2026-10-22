@@ -1,7 +1,7 @@
 /* =========================================================================
    Nav — floating monochrome glass pill.
    Light frosted glass over light sections; dark glass while the pill overlaps
-   a section[data-theme="dark"] (Nav.tsx sets data-tone on the pill).
+   any [data-theme="dark"] element (Nav.tsx sets data-tone on the pill).
    Every tone change (fill, rim, text, logo, toggle, CTA) runs on one clock.
    ========================================================================= */
 

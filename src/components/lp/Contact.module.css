@@ -83,9 +83,6 @@
 .title:global(.is-in) .word > span {
   transform: none;
 }
-.stop {
-  margin-left: -0.07em;
-}
 
 /* JA prose: wrap at phrase boundaries where the browser can, normal breaking elsewhere */
 .jaPhrase {
@@ -204,7 +201,8 @@
   margin-bottom: 8px;
 }
 .tag {
-  margin-left: 4px;
+  /* the whole gap after the label text: no space character sits between them (see tag() in Contact.tsx) */
+  margin-left: 6px;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.02em;

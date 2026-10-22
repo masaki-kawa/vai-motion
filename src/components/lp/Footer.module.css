@@ -44,8 +44,3 @@
 .brand:global(.is-in) :global(.m-line) > span {
   transform: none;
 }
-
-/* optical kerning for a line-final full stop (see kernStop) */
-.stop {
-  margin-left: -0.07em;
-}

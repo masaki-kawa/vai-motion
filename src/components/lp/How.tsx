@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useT } from "../LangProvider";
 import Html from "./Html";
+import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./How.module.css";
 
@@ -202,7 +203,7 @@ function Step({ n, index, on, fd }: { n: number; index: number; on: boolean; fd:
             in the narrow 900–1099 columns so 「広告アカウントに」 stays whole */}
         <Html
           as="h3"
-          html={t(`how.${n}.title`)}
+          html={ja ? t(`how.${n}.title`) : bindShortWords(t(`how.${n}.title`))}
           className={`mt-2.5 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-3.5 min-[1100px]:text-[21px] ${
             ja ? `${s.jaPhrase} text-[18px] min-[900px]:text-[17px]` : "text-[19px]"
           }`}
@@ -232,17 +233,6 @@ function Arrow() {
    can follow the last line: `--d: calc(var(--title-end, 240ms) + 120ms)`.
    ------------------------------------------------------------------------------------------ */
 
-type Part = { word: string } | { sep: "wbr" | "space" };
-
-/** null when the copy holds markup other than <wbr>; it then rises as one block */
-function splitTitle(html: string): Part[] | null {
-  if (/<(?!wbr\b)[a-z]/i.test(html)) return null;
-  return html
-    .split(/(<wbr\s*\/?>|\s+)/i)
-    .filter(Boolean)
-    .map((p): Part => (/^<wbr/i.test(p) ? { sep: "wbr" } : /^\s+$/.test(p) ? { sep: "space" } : { word: p }));
-}
-
 export function SplitTitle({
   id,
   html,
@@ -258,7 +248,8 @@ export function SplitTitle({
   style?: CSSProperties;
 }) {
   const ref = useRef<HTMLHeadingElement>(null);
-  const parts = splitTitle(html);
+  // null when the copy holds markup other than <wbr>; it then rises as one block
+  const parts = splitHeading(html);
   const text = html.replace(/<[^>]+>/g, "");
 
   useEffect(() => {
@@ -298,7 +289,7 @@ export function SplitTitle({
             {parts.map((p, i) =>
               "word" in p ? (
                 <span key={i} data-w="" className={`m-line ${s.word}`}>
-                  <span>{p.word}</span>
+                  <span>{kernWord(p.word)}</span>
                 </span>
               ) : p.sep === "wbr" ? (
                 <wbr key={i} />
@@ -310,7 +301,7 @@ export function SplitTitle({
         </>
       ) : (
         <span className="m-line">
-          <Html html={html} style={delay(80)} />
+          <Html html={kernHtml(bindShortWords(html))} style={delay(80)} />
         </span>
       )}
     </h2>

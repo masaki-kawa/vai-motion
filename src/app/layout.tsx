@@ -18,9 +18,9 @@ const notoJp = Noto_Sans_JP({
   display: "swap",
 });
 
-const title = "VAI MOTION — AI video generation";
+const title = "VAI MOTION — Videos and Meta ads for Sydney businesses";
 const description =
-  "AI-made promo videos, finished by a human. Fast, affordable videos for local businesses, SaaS products, and online brands.";
+  "We make short videos from the photos you already have, then run them as Instagram and Facebook ads to people near your shop. No filming. Monthly plans in AUD, cancel anytime.";
 
 export const metadata: Metadata = {
   // set NEXT_PUBLIC_SITE_URL to the real domain in production (falls back to the placeholder)
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     title,
     description,
     url: "/",
-    images: [{ url: "/og.jpg?v=2", width: 1200, height: 630, alt: "VAI MOTION" }],
+    images: [{ url: "/og-lp.jpg?v=1", width: 1200, height: 630, alt: "VAI MOTION" }],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/og.jpg?v=2"],
+    images: ["/og-lp.jpg?v=1"],
   },
   icons: {
     icon: "/assets/vai-mark.png",
@@ -53,14 +53,17 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // render the right language server-side (from the cookie) so there is no flash for returning visitors
+  // render the right language server-side (from the cookie) so there is no flash for returning visitors.
+  // A page whose ?lang= differs from the cookie corrects lang/.lang-ja before first paint with a
+  // tiny inline script (see app/page.tsx), hence suppressHydrationWarning.
   const store = await cookies();
   const lang = normalizeLang(store.get(LANG_COOKIE)?.value) ?? "en";
 
   return (
     <html
       lang={lang}
-      className={`scroll-smooth ${jakarta.variable} ${notoJp.variable} ${
+      suppressHydrationWarning
+      className={`motion-safe:scroll-smooth ${jakarta.variable} ${notoJp.variable} ${
         lang === "ja" ? "lang-ja" : ""
       }`}
     >

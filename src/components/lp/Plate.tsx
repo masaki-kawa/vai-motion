@@ -74,7 +74,8 @@ export default function Plate({
       const vh = window.innerHeight;
       // -1 when the plate's centre is at the bottom of the viewport → +1 at the top
       const p = Math.max(-1, Math.min(1, (vh / 2 - (r.top + r.height / 2)) / (vh / 2 + r.height / 2)));
-      el.style.transform = `translate3d(0, ${(p * drift).toFixed(1)}px, 0)`;
+      // 2D on purpose: the nav lens copies this style, and a 3D transform there kills its warp in Safari
+      el.style.transform = `translate(0, ${(p * drift).toFixed(1)}px)`;
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);

@@ -235,7 +235,7 @@
    ========================================================================= */
 .armed .rise {
   opacity: 0;
-  transform: translate3d(0, 16px, 0);
+  transform: translate(0, 16px);
 }
 .armed :global(.is-in) .rise {
   opacity: 1;
@@ -246,7 +246,7 @@
 
 /* deeper than 100%, so no ascender tip peeks over the mask */
 .armed .mask > span {
-  transform: translate3d(0, 125%, 0);
+  transform: translate(0, 125%);
 }
 .armed :global(.is-in) .mask > span {
   transform: none;
@@ -259,7 +259,7 @@
   clip-path: inset(-0.2em -0.2em 0 -0.2em);
 }
 .armed .num > span {
-  transform: translate3d(0, 110%, 0);
+  transform: translate(0, 110%);
 }
 .armed :global(.is-in) .num > span {
   transform: none;

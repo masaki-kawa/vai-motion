@@ -101,7 +101,7 @@
 @keyframes faqIn {
   from {
     opacity: 0;
-    transform: translate3d(0, -4px, 0);
+    transform: translate(0, -4px);
   }
   to {
     opacity: 1;

@@ -38,7 +38,7 @@
   margin-bottom: -0.2em;
 }
 .brand :global(.m-line) > span {
-  transform: translate3d(0, 118%, 0);
+  transform: translate(0, 118%);
   transition-duration: 1.1s;
 }
 .brand:global(.is-in) :global(.m-line) > span {

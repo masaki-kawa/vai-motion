@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react
 import Image from "next/image";
 import { useT } from "../LangProvider";
 import type { Lang } from "@/lib/i18n";
+import { useMirror } from "./useMirror";
 import s from "./Nav.module.css";
 
 const LINKS = [
@@ -32,6 +33,7 @@ export default function Nav() {
 
   const headerRef = useRef<HTMLElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
+  const lensRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const releaseRef = useRef<(() => void) | null>(null);
@@ -42,6 +44,8 @@ export default function Nav() {
     const v = t(key);
     return v === key ? (cur === "ja" ? ja : en) : v;
   };
+
+  useMirror(pillRef, lensRef);
 
   // ---- tone: smoke glass while the pill's centre line is over a [data-theme="dark"] surface
   // (Budget slab, Growth card, pricing stage, Contact). The hero plate is deliberately NOT
@@ -80,7 +84,8 @@ export default function Nav() {
         },
         { rootMargin: `-${top}px 0px -${bottom}px 0px` },
       );
-      document.querySelectorAll('[data-theme="dark"]').forEach((el) => io!.observe(el));
+      // (not the lens's copy of the page: useMirror)
+      document.querySelectorAll('[data-theme="dark"]:not(.lp-mirror *)').forEach((el) => io!.observe(el));
 
       // plates: the pill's whole height, so the thicker milk is already on when a picture's
       // edge first slides under the links (over white page it is invisible anyway)
@@ -110,7 +115,7 @@ export default function Nav() {
         },
         { rootMargin: `-${pTop}px 0px -${pBottom}px 0px` },
       );
-      document.querySelectorAll(".m-plate").forEach((el) => plateIo!.observe(el));
+      document.querySelectorAll(".m-plate:not(.lp-mirror *)").forEach((el) => plateIo!.observe(el));
     };
     const onResize = () => {
       if (!raf) raf = requestAnimationFrame(build);
@@ -289,6 +294,12 @@ export default function Nav() {
         className={`${s.pill} ${s.enter} m-pill-rim`}
         inert={open}
       >
+        {/* the warp outside Chromium: useMirror fills it with a live copy of the page */}
+        <div className={s.lens} aria-hidden="true">
+          <div className={s.lensIn}>
+            <div ref={lensRef} className={s.lensClip} />
+          </div>
+        </div>
         <a href="#top" className={s.brand}>
           {logo}
         </a>

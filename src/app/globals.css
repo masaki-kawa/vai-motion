@@ -671,7 +671,7 @@ html.lang-ja .m-body {
 /* ---- reveal (one shared IntersectionObserver hook toggles .is-in) ---- */
 .m-reveal {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
+  transform: translate(0, 28px);
   transition: opacity 0.9s var(--m-ease), transform 0.9s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }
@@ -688,7 +688,7 @@ html.lang-ja .m-body {
 }
 .m-line > span {
   display: inline-block;
-  transform: translate3d(0, 118%, 0);
+  transform: translate(0, 118%);
   transition: transform 1s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }
@@ -1072,6 +1072,21 @@ html.lg-refract .m-chip--light.m-lens {
   }
 }
 
+/* useMirror (Nav lens, Safari/iOS/Firefox): WebKit drops the lens's url() filter as soon as
+   anything inside it gets its own compositing layer, so the copy of the page must have none:
+   no animations or transitions (running or paused), no will-change, no backdrop filters, and
+   no 3D transforms. That last one can't be undone here, which is why every transform on the
+   LP is 2D (translate(), never translate3d(), even with z = 0). */
+.lp-mirror *,
+.lp-mirror *::before,
+.lp-mirror *::after {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* ---- hero studio: what the empty hero slot shows until hero.jpg is ready
    (Plate scene="studio"). A dark wall, a floor, one thin vertical line of light standing on
    the horizon, one slow pass of light. The line runs up under the nav, so the nav visibly
@@ -1156,16 +1171,16 @@ html.lg-refract .m-chip--light.m-lens {
     rgba(255, 255, 255, 0.06) 55%,
     rgba(255, 255, 255, 0) 100%
   );
-  transform: translate3d(-110%, 0, 0) skewX(-14deg);
+  transform: translate(-110%, 0) skewX(-14deg);
   animation: m-pass 12s var(--m-ease) infinite;
 }
 @keyframes m-pass {
   0% {
-    transform: translate3d(-110%, 0, 0) skewX(-14deg);
+    transform: translate(-110%, 0) skewX(-14deg);
   }
   62%,
   100% {
-    transform: translate3d(290%, 0, 0) skewX(-14deg);
+    transform: translate(290%, 0) skewX(-14deg);
   }
 }
 
@@ -1224,10 +1239,10 @@ html.lg-refract .m-chip--light.m-lens {
 }
 @keyframes m-beams {
   from {
-    transform: translate3d(-6%, 0, 0);
+    transform: translate(-6%, 0);
   }
   to {
-    transform: translate3d(8%, 0, 0);
+    transform: translate(8%, 0);
   }
 }
 
@@ -1246,7 +1261,7 @@ html.lg-refract .m-chip--light.m-lens {
 @media (prefers-reduced-motion: reduce) {
   .m-studio-pass {
     animation: none;
-    transform: translate3d(70%, 0, 0) skewX(-14deg);
+    transform: translate(70%, 0) skewX(-14deg);
   }
   .m-stage-beams {
     animation: none;

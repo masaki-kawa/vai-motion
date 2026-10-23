@@ -13,7 +13,7 @@
 }
 /* deeper start than the shared 105%, so no ascender tip shows above the mask */
 .rise .word > span {
-  transform: translate3d(0, 125%, 0);
+  transform: translate(0, 125%);
 }
 .rise:global(.is-in) .word > span {
   transform: none;
@@ -108,7 +108,7 @@
   line-height: 1.5;
   color: var(--m-soft);
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  transform: translate(0, 8px);
   transition: opacity 0.6s ease, transform 0.8s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }

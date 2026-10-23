@@ -78,7 +78,7 @@
 }
 /* a deeper start than the shared 105%, so no ascender tip peeks over the mask */
 .title .word > span {
-  transform: translate3d(0, 125%, 0);
+  transform: translate(0, 125%);
 }
 .title:global(.is-in) .word > span {
   transform: none;
@@ -467,7 +467,7 @@
 @keyframes ctEnter {
   from {
     opacity: 0;
-    transform: translate3d(0, -4px, 0);
+    transform: translate(0, -4px);
   }
   to {
     opacity: 1;
@@ -477,7 +477,7 @@
 @keyframes ctIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
+    transform: translate(0, 12px);
   }
   to {
     opacity: 1;

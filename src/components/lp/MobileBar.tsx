@@ -74,7 +74,7 @@ export default function MobileBar() {
         },
         { rootMargin: `-${top}px 0px -${bottom}px 0px` },
       );
-      document.querySelectorAll('[data-theme="dark"]').forEach((el) => io!.observe(el));
+      document.querySelectorAll('[data-theme="dark"]:not(.lp-mirror *)').forEach((el) => io!.observe(el));
     };
     const onResize = () => {
       if (!raf) raf = requestAnimationFrame(build);

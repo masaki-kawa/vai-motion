@@ -5,7 +5,7 @@ import { useT } from "../LangProvider";
 import Html from "./Html";
 import Plate from "./Plate";
 import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
-import { useReveal } from "./useReveal";
+import { useReveal, usePauseOffscreen } from "./useReveal";
 import s from "./Pricing.module.css";
 
 /** the `vai:plan` keys the contact form pre-selects from */
@@ -49,7 +49,7 @@ function PlanCta({
   className?: string;
 }) {
   const { cur } = useT();
-  const toneCls = tone === "dark" ? "m-btn--dark m-rim-dark" : tone === "white" ? "m-btn--white" : "m-btn--light";
+  const toneCls = tone === "dark" ? "m-btn--dark" : tone === "white" ? "m-btn--white" : "m-btn--light";
   return (
     <a
       href="#contact"
@@ -100,10 +100,12 @@ export default function Pricing() {
   const { t, cur } = useT();
   const ja = cur === "ja";
   const head = useReveal<HTMLDivElement>();
+  const stageRef = useRef<HTMLDivElement>(null);
+  usePauseOffscreen(stageRef);
 
   return (
     <section id="pricing" aria-labelledby="pricing-title" className="relative bg-[#F4F5F6]">
-      <div className="mx-auto max-w-[1240px] px-4 py-24 sm:px-8 min-[900px]:py-[160px]">
+      <div className="mx-auto max-w-[1240px] px-4 pt-24 sm:px-8 min-[900px]:pt-[160px]">
         {/* ---- header ---- */}
         <div ref={head.ref}>
           <p className={`m-kicker m-reveal ${head.cls}`} style={ja ? { ...delay(0), ...JA_KICKER } : delay(0)}>
@@ -130,21 +132,36 @@ export default function Pricing() {
           </p>
         </div>
 
-        {/* ---- main group: Videos + Meta ads ---- */}
+        {/* ---- main group: Videos + Meta ads. The cards sit above the stage (z-2); the stage slides
+            up under their lower halves, so each card shows the white→black edge through its body ---- */}
         <div className="mt-16 min-[900px]:mt-24">
           <GroupLabel />
 
           {/* Growth + Ads leads in the DOM, so phones read and tab it first as they show it; from
               900px both cards are placed in row 1, Light | Growth. The dark card stands 48px
               taller (its Recommended row), so names, prices and CTAs line up across the pair. */}
-          <div className="mt-6 grid gap-5 min-[900px]:mt-8 min-[900px]:grid-cols-2 min-[900px]:gap-8">
+          <div className="relative z-[2] mt-6 grid gap-5 min-[900px]:mt-8 min-[900px]:grid-cols-2 min-[900px]:gap-8">
             <PlanCard kind="ga" />
             <PlanCard kind="la" />
           </div>
-
-          <Included />
-          <Spend />
         </div>
+      </div>
+
+      {/* ---- the stage: near-black, under the plans' lower halves and behind "Both plans include".
+          data-theme="dark": the Nav turns smoke and the MobileBar milk over it ---- */}
+      <div ref={stageRef} data-theme="dark" className="m-stage">
+        <div className="m-stage-bg" aria-hidden="true">
+          <div className="m-stage-spill" />
+          <div className="m-stage-beams" />
+        </div>
+        {/* inner gutters = page gutters minus the stage's 8/12px inset, so Included lines up with the plans */}
+        <div className="relative mx-auto max-w-[1216px] px-2 sm:px-6 min-[900px]:px-5">
+          <Included />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-12 sm:px-8 min-[900px]:pb-[160px] min-[900px]:pt-16">
+        <Spend />
 
         {/* ---- secondary: videos only (1–5) and one-off promos (6–12) ---- */}
         <div className="mt-20 grid gap-5 min-[900px]:mt-[120px] min-[900px]:grid-cols-12 min-[900px]:items-start min-[900px]:gap-8">
@@ -202,8 +219,8 @@ function PlanCard({ kind }: { kind: "la" | "ga" }) {
       data-theme={dark ? "dark" : undefined}
       className={`m-reveal ${cls} flex flex-col rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:p-10 ${
         dark
-          ? `m-glass-dark m-rim-dark ${s.dark} ${s.lag} min-[900px]:col-start-2 min-[900px]:row-start-1`
-          : "m-glass m-rim min-[900px]:col-start-1 min-[900px]:row-start-1 min-[900px]:mt-12"
+          ? `m-glass-dark ${s.lag} min-[900px]:col-start-2 min-[900px]:row-start-1`
+          : "m-glass m-glass--thick min-[900px]:col-start-1 min-[900px]:row-start-1 min-[900px]:mt-12"
       }`}
     >
       <h4
@@ -256,7 +273,9 @@ function PlanCard({ kind }: { kind: "la" | "ga" }) {
       <div className="mt-auto pt-8">
         <p
           className={`tabular rounded-[14px] px-4 py-3.5 text-[15px] font-semibold [text-wrap:pretty] ${
-            dark ? "bg-white/[0.08] text-white" : "bg-[#F4F5F6] text-[color:var(--m-ink)]"
+            dark
+              ? "bg-white/[0.07] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              : "bg-[rgba(20,24,28,0.05)] text-[color:var(--m-ink)] shadow-[inset_0_1px_2px_rgba(20,24,28,0.08)]"
           }`}
           style={{ lineHeight: ja ? 1.75 : 1.5 }}
         >
@@ -286,10 +305,10 @@ function Included() {
     <>
       <div
         ref={ref}
-        className={`m-glass m-rim m-reveal ${cls} mt-5 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-8 min-[900px]:p-10`}
+        className={`m-glass-clear m-reveal ${cls} rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:p-10`}
       >
         <h4
-          className={`text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-[color:var(--m-ink)] ${
+          className={`text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-white ${
             ja ? s.jaLabel : ""
           }`}
         >
@@ -302,7 +321,7 @@ function Included() {
       </div>
       {/* under the card, inset to its text column; revealed with it */}
       <p
-        className={`m-reveal ${cls} mt-4 max-w-[48em] px-5 text-[14px] text-[color:var(--m-mute)] [text-wrap:pretty] sm:px-8 min-[900px]:px-10`}
+        className={`m-reveal ${cls} mt-4 max-w-[48em] px-5 text-[14px] text-[color:var(--m-dark-mute)] [text-wrap:pretty] sm:px-8 min-[900px]:px-10`}
         style={{ ...delay(200), lineHeight: ja ? 1.8 : 1.6 }}
       >
         {t("pr.incl.not")}
@@ -317,7 +336,7 @@ function IncludedList({ title, items, lead }: { title: string; items: string[]; 
   return (
     <div>
       <h5
-        className={`font-bold text-[color:var(--m-ink)] ${
+        className={`font-bold text-[color:var(--m-dark-mute)] ${
           ja ? "text-[13px] tracking-[0.06em]" : "text-[12px] uppercase tracking-[0.14em]"
         }`}
       >
@@ -327,7 +346,7 @@ function IncludedList({ title, items, lead }: { title: string; items: string[]; 
         {items.map((item, i) => (
           <li
             key={i}
-            className="py-[14px] text-[16px] font-medium text-[color:var(--m-ink)] [text-wrap:pretty]"
+            className="py-[14px] text-[16px] font-medium text-white [text-wrap:pretty]"
             style={{ ...delay(lead + i * 60), lineHeight: ja ? 1.7 : 1.5 }}
           >
             {item}
@@ -348,7 +367,7 @@ function Spend() {
   return (
     <div
       ref={ref}
-      className={`m-glass m-rim m-reveal ${cls} mt-5 rounded-[32px] px-6 py-8 sm:p-8 min-[900px]:mt-8 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:p-10 min-[1100px]:px-12`}
+      className={`m-glass m-reveal ${cls} rounded-[32px] px-6 py-8 sm:p-8 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:p-10 min-[1100px]:px-12`}
     >
       <span aria-hidden="true" className={s.rule} />
 
@@ -414,7 +433,7 @@ function VideosOnly() {
   return (
     <div
       ref={ref}
-      className={`m-glass m-rim m-reveal ${cls} flex flex-col rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:sticky min-[900px]:top-28 min-[900px]:col-span-6 min-[1100px]:col-span-5 min-[1100px]:p-10`}
+      className={`m-glass m-reveal ${cls} flex flex-col rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:sticky min-[900px]:top-28 min-[900px]:col-span-6 min-[1100px]:col-span-5 min-[1100px]:p-10`}
     >
       <h3
         className={`text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-[color:var(--m-ink)] ${ja ? s.jaLabel : ""}`}
@@ -478,7 +497,7 @@ function Promo() {
   return (
     <div
       ref={ref}
-      className={`m-glass m-rim m-reveal ${cls} ${s.lag} rounded-[32px] min-[900px]:col-span-6 min-[1100px]:col-span-7`}
+      className={`m-glass m-reveal ${cls} ${s.lag} rounded-[32px] min-[900px]:col-span-6 min-[1100px]:col-span-7`}
     >
       {/* below 768px the plate is not shown, so this card stays lighter than the main plans */}
       <div className={`${s.promoPlate} hidden p-2 pb-0 min-[768px]:block`}>

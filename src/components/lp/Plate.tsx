@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { LP_IMAGES, type LpImageKey } from "@/lib/lpImages";
-import { useReveal } from "./useReveal";
+import { useReveal, usePauseOffscreen } from "./useReveal";
 
 type PlateProps = {
   img: LpImageKey;
@@ -21,6 +21,12 @@ type PlateProps = {
   /** gentle scroll drift on desktop (px, negative = up) */
   drift?: number;
   className?: string;
+  /** what the slot shows while the image is not ready: the flat gradient (default) or the lit studio */
+  scene?: "studio";
+  /** caption chip material; defaults to the image tone (light image → milk chip, dark → smoke chip) */
+  chip?: "light" | "dark";
+  /** Chromium-only refraction on the chip (hero only) */
+  lens?: boolean;
 };
 
 /**
@@ -40,11 +46,17 @@ export default function Plate({
   priority = false,
   drift = 0,
   className = "",
+  scene,
+  chip,
+  lens = false,
 }: PlateProps) {
   const meta = LP_IMAGES[img];
   const { ref, cls } = useReveal<HTMLElement>(0.15);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
+  /** reveal finished: .is-open drops the figure's clip-path (it would make the plate a backdrop root) */
+  const [open, setOpen] = useState(false);
+  usePauseOffscreen(wrapRef, scene === "studio" && !meta.ready);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -77,7 +89,8 @@ export default function Plate({
     };
   }, [drift]);
 
-  const chipTone = meta.tone === "dark" ? "m-chip--dark" : "m-chip--light";
+  const chipIsDark = (chip ?? meta.tone) === "dark";
+  const chipTone = chipIsDark ? "m-chip--dark" : "m-chip--light";
   const style = {
     "--r": ratio,
     "--rm": mobileRatio ?? ratio,
@@ -88,8 +101,13 @@ export default function Plate({
     <div ref={wrapRef} className={`will-change-transform ${className}`}>
       <figure
         ref={ref}
-        className={`m-plate m-plate-reveal ${meta.tone === "dark" ? "m-rim-dark" : "m-rim"} m-plate-ratio ${cls}`}
+        className={`m-plate m-plate-reveal ${meta.tone === "dark" ? "m-rim-dark" : "m-rim"} m-plate-ratio ${cls} ${
+          open ? "is-open" : ""
+        }`}
         style={style}
+        onTransitionEnd={(e) => {
+          if (e.target === e.currentTarget && /clip-path$/.test(e.propertyName)) setOpen(true);
+        }}
       >
         {meta.ready ? (
           <Image
@@ -104,16 +122,22 @@ export default function Plate({
             }`}
             style={{ objectPosition }}
           />
+        ) : scene === "studio" ? (
+          <div className="m-plate-media m-studio" role="img" aria-label={alt}>
+            <div className="m-studio-floor" />
+            <div className="m-studio-line" />
+            <div className="m-studio-pass" />
+          </div>
         ) : (
           <div className="m-plate-media absolute inset-0" style={{ background: meta.fallback }} role="img" aria-label={alt} />
         )}
         {(l1 || l2) && (
-          <figcaption className={`m-chip ${chipTone}`}>
+          <figcaption className={`m-chip ${chipTone} ${lens ? "m-lens" : ""}`}>
             {l1 && <span className="m-jp-break block text-[13px] sm:text-[15px] font-bold leading-snug">{l1}</span>}
             {l2 && (
               <span
                 className={`block mt-0.5 text-[12px] sm:text-[13px] leading-snug ${
-                  meta.tone === "dark" ? "text-white/75" : "text-[color:var(--m-soft)]"
+                  chipIsDark ? "text-white/75" : "text-[color:var(--m-soft)]"
                 }`}
               >
                 {l2}

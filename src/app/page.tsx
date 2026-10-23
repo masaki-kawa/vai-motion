@@ -14,10 +14,16 @@ import Faq from "@/components/lp/Faq";
 import Contact from "@/components/lp/Contact";
 import Footer from "@/components/lp/Footer";
 import MobileBar from "@/components/lp/MobileBar";
+import GlassDefs from "@/components/lp/GlassDefs";
 import { I18N_LP } from "@/lib/i18n.lp";
 import type { Lang } from "@/lib/i18n";
 import { cookies } from "next/headers";
 import { LANG_COOKIE, normalizeLang } from "@/lib/lang";
+
+/** Chromium only (navigator.userAgentData brands): turns on the url(#lp-refract) backdrop
+ *  refraction. Safari / iOS (Chrome on iOS included) and Firefox never get the class, so they
+ *  never see a url() filter. ?webkit forces the WebKit path in Chromium, for screenshots. */
+const REFRACT = `(function(d){try{var b=navigator.userAgentData&&navigator.userAgentData.brands;if(b&&b.some(function(x){return x.brand==="Chromium"})&&!/[?&]webkit\\b/.test(location.search))d.classList.add("lg-refract")}catch(e){}})(document.documentElement)`;
 
 type Props = { searchParams: Promise<{ lang?: string }> };
 
@@ -79,11 +85,13 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <>
+      <script dangerouslySetInnerHTML={{ __html: REFRACT }} />
       {fixHtml && <script dangerouslySetInnerHTML={{ __html: fixHtml }} />}
       <LangProvider initialLang={initialLang} dict={I18N_LP}>
         <DocTitle titles={TITLES} />
         <div className="lp">
           <SkipLink />
+          <GlassDefs />
           <SmoothScroll />
           <Nav />
           <main id="top">

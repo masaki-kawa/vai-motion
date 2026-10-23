@@ -16,8 +16,12 @@ export const LP_IMAGES: Record<
     ready: false,
     width: 2400,
     height: 1600,
-    fallback: "linear-gradient(160deg,#EEEFF0 0%,#DADCDF 60%,#CBCED2 100%)",
-    tone: "light",
+    // the plate is the dark surface the hero glass needs: until the photo is ready it shows the
+    // CSS studio (Plate scene="studio"). Photo brief: LOW-KEY B&W (dark background); keep the
+    // subject inside the middle band. The nav covers the top ~13% on desktop / ~21% on phones,
+    // and the chip covers the bottom-left.
+    fallback: "#0b0c0e",
+    tone: "dark",
   },
   shoot: {
     src: "/assets/lp/shoot.jpg",

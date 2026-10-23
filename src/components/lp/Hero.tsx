@@ -27,47 +27,48 @@ export default function Hero() {
     .filter(Boolean)
     .map(kernHtml); // pull a final "." in (EN only; JA ends in 「。」)
 
+  const titleStyle = {
+    // phone and desktop sizes, inline so a ?lang=ja first render is right (Hero.module.css .title)
+    "--h1-m": ja ? "clamp(30px,9.2vw,44px)" : "clamp(40px,7.2vw,112px)",
+    "--h1-d": ja ? "clamp(32px,3.9vw,56px)" : "clamp(34px,3.5vw,52px)",
+    lineHeight: ja ? 1.12 : 0.98,
+    letterSpacing: ja ? "-0.02em" : "-0.04em",
+  } as CSSProperties;
+
   return (
     // no id: <main id="top"> wraps the page
-    <section aria-labelledby="hero-title" className="relative bg-white">
-      <div className="mx-auto max-w-[1240px] px-4 pb-6 pt-[112px] sm:px-8 min-[900px]:pb-8 min-[900px]:pt-[168px]">
-        <p
-          className={`m-kicker [text-wrap:balance] ${s.fade}`}
-          // JA metrics inline as well, so a ?lang=ja first render is right before <html> gets .lang-ja
-          style={ja ? { ...delay(0), fontSize: 13, letterSpacing: "0.06em", textTransform: "none" } : delay(0)}
-        >
-          {t("hero.eyebrow")}
-        </p>
+    <section aria-labelledby="hero-title" className={`relative ${s.hero}`}>
+      <div className={s.grid}>
+        <div className={s.copy}>
+          <p
+            className={`m-kicker [text-wrap:balance] ${s.fade}`}
+            // JA metrics inline as well, so a ?lang=ja first render is right before <html> gets .lang-ja
+            style={ja ? { ...delay(0), fontSize: 13, letterSpacing: "0.06em", textTransform: "none" } : delay(0)}
+          >
+            {t("hero.eyebrow")}
+          </p>
 
-        <h1
-          id="hero-title"
-          className={`m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-7 ${s.title}`}
-          style={{
-            fontSize: ja ? "clamp(34px,6vw,92px)" : "clamp(40px,7.2vw,112px)",
-            lineHeight: ja ? 1.12 : 0.96,
-            letterSpacing: ja ? "-0.02em" : "-0.04em",
-          }}
-        >
-          {lines.map((line, i) => (
-            <span key={i} className="m-line">
-              <Html html={line} style={delay(90 + i * 80)} />
-            </span>
-          ))}
-        </h1>
+          <h1
+            id="hero-title"
+            className={`m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-6 ${s.title}`}
+            style={titleStyle}
+          >
+            {lines.map((line, i) => (
+              <span key={i} className="m-line">
+                <Html html={line} style={delay(90 + i * 80)} />
+              </span>
+            ))}
+          </h1>
 
-        <div className="mt-8 min-[900px]:mt-14 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:items-start min-[900px]:gap-x-8">
-          {/* 1–5 / 6–12 from 1100px; an even split on narrow desktops keeps both pills on one line */}
-          <div className={`min-[900px]:col-span-6 min-[1100px]:col-span-5 ${s.fade}`} style={delay(380)}>
-            <p className="m-body max-w-[30em] text-[17px] text-[color:var(--m-soft)] min-[900px]:text-[19px]">
+          {/* .fade (opacity) may wrap these: the buttons are solid beads, nothing here has a backdrop-filter */}
+          <div className={s.fade} style={delay(380)}>
+            <p className="m-body mt-6 max-w-[30em] text-[17px] text-[color:var(--m-soft)] min-[900px]:mt-7 min-[900px]:text-[18px]">
               {t("hero.sub")}
             </p>
 
             {/* MobileBar observes #hero-ctas */}
             <div id="hero-ctas" className="mt-8 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:flex-wrap">
-              <a
-                href="#contact"
-                className="m-btn m-btn--dark m-rim-dark h-[54px] px-7 text-[15px] focus-visible:!rounded-full"
-              >
+              <a href="#contact" className="m-btn m-btn--dark h-[54px] px-7 text-[15px] focus-visible:!rounded-full">
                 <span>{t("hero.cta1")}</span>
                 <svg
                   className="m-arrow shrink-0"
@@ -87,44 +88,41 @@ export default function Hero() {
                   />
                 </svg>
               </a>
-              <a
-                href="#pricing"
-                className="m-btn m-btn--light h-[54px] px-7 text-[15px] focus-visible:!rounded-full"
-              >
-                {t("hero.cta2")}
+              <a href="#pricing" className="m-btn m-btn--light h-[54px] px-7 text-[15px] focus-visible:!rounded-full">
+                <span>{t("hero.cta2")}</span>
               </a>
             </div>
-
-            <ul className="mt-10 min-[900px]:mt-12">
-              {FACTS.map((f) => (
-                <li
-                  key={f}
-                  className={`border-t border-[color:var(--m-line)] py-[14px] text-[15px] [text-wrap:pretty] ${
-                    ja ? "leading-[1.75]" : "leading-[1.55]"
-                  }`}
-                >
-                  {/* k and v share one line: no break between them in the markup */}
-                  <span className="font-semibold text-[color:var(--m-ink)]">{t(`hero.${f}.k`)}</span>
-                  {ja ? "" : " "}
-                  <span className="text-[color:var(--m-soft)]">{t(`hero.${f}.v`)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="mt-12 min-[900px]:col-span-6 min-[900px]:col-start-7 min-[900px]:mt-0 min-[1100px]:col-span-7 min-[1100px]:col-start-6">
-            <Plate
-              img="hero"
-              alt={ALT[cur]}
-              l1={t("hero.plate.l1")}
-              l2={t("hero.plate.l2")}
-              ratio="3 / 2"
-              sizes="(min-width: 1240px) 680px, (min-width: 1100px) 54vw, (min-width: 900px) 46vw, calc(100vw - 32px)"
-              priority
-              drift={-24}
-            />
           </div>
         </div>
+
+        <div className={s.plate}>
+          <Plate
+            img="hero"
+            alt={ALT[cur]}
+            l1={t("hero.plate.l1")}
+            l2={t("hero.plate.l2")}
+            ratio="3 / 2"
+            mobileRatio="4 / 3"
+            scene="studio"
+            chip="light"
+            lens
+            sizes="(min-width: 1640px) 820px, (min-width: 900px) 50vw, calc(100vw - 16px)"
+            priority
+          />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1240px] px-4 pb-6 sm:px-8 min-[900px]:pb-8">
+        <ul className={`${s.facts} ${s.fade}`} style={delay(520)}>
+          {FACTS.map((f) => (
+            <li key={f} className={`[text-wrap:pretty] ${ja ? "leading-[1.75]" : "leading-[1.55]"}`}>
+              {/* k and v share one line: no break between them in the markup */}
+              <span className="font-semibold text-[color:var(--m-ink)]">{t(`hero.${f}.k`)}</span>
+              {ja ? "" : " "}
+              <span className="text-[color:var(--m-soft)]">{t(`hero.${f}.v`)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

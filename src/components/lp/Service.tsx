@@ -170,7 +170,7 @@ function Improve() {
   const { ref, cls } = useReveal<HTMLDivElement>();
 
   return (
-    <div className="m-glass m-rim mt-20 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-[120px] min-[900px]:p-14">
+    <div className="m-glass mt-20 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-[120px] min-[900px]:p-14">
       <div className="min-[1100px]:grid min-[1100px]:grid-cols-12 min-[1100px]:items-center min-[1100px]:gap-x-8">
         <div ref={ref} className="min-[1100px]:col-span-6">
           <Label text={t("svc.imp.label")} cls={cls} />

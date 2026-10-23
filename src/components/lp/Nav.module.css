@@ -1,7 +1,7 @@
 /* =========================================================================
    Nav — floating monochrome glass pill.
-   Light frosted glass over light sections; dark glass while the pill overlaps
-   any [data-theme="dark"] element (Nav.tsx sets data-tone on the pill).
+   Milk glass over light content; smoke glass while the pill's centre line is over
+   a [data-theme="dark"] surface (Nav.tsx sets data-tone on the pill).
    Every tone change (fill, rim, text, logo, toggle, CTA) runs on one clock.
    ========================================================================= */
 
@@ -33,80 +33,49 @@
   padding: 0 10px;
   border-radius: 999px;
   color: var(--m-ink);
-  background-color: rgba(255, 255, 255, 0.72);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  backdrop-filter: blur(20px) saturate(1.2);
+  /* milk glass. White over the white page; silver (≈ rgb 186) over the hero plate or any dark
+     content, which shows through it. The rim is the global .m-pill-rim. */
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(16px) brightness(1.05);
+  backdrop-filter: blur(16px) brightness(1.05);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(20, 24, 28, 0.04),
-    0 14px 36px -16px rgba(20, 24, 28, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 12px 1px rgba(255, 255, 255, 0.35),
+    inset 0 12px 16px -12px rgba(255, 255, 255, 0.9),
+    inset 0 -10px 16px -12px rgba(20, 24, 28, 0.14),
+    inset 0 -1px 0 rgba(20, 24, 28, 0.05),
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 16px 36px -16px rgba(20, 24, 28, 0.28);
   transition:
     background-color var(--tone) var(--m-ease),
     box-shadow var(--tone) var(--m-ease),
-    color var(--tone) var(--m-ease);
+    color var(--tone) var(--m-ease),
+    -webkit-backdrop-filter var(--tone) var(--m-ease),
+    backdrop-filter var(--tone) var(--m-ease);
 }
 .enter {
-  animation: navIn 0.7s var(--m-ease) 0.08s both;
+  animation: navIn 0.7s var(--m-ease) 0.08s backwards;
 }
 @keyframes navIn {
   from {
-    opacity: 0;
-    transform: translate3d(0, -10px, 0);
+    transform: translate3d(0, -14px, 0);
   }
 }
 
-/* conic rims: light and dark stacked, cross-faded with the tone */
-.pill::before,
-.pill::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  transition: opacity var(--tone) var(--m-ease);
-}
-.pill::before {
-  background: conic-gradient(
-    from -75deg,
-    rgba(255, 255, 255, 0.9),
-    rgba(20, 24, 28, 0.16) 12%,
-    rgba(255, 255, 255, 0.6) 45%,
-    rgba(20, 24, 28, 0.1) 62%,
-    rgba(255, 255, 255, 0.9)
-  );
-}
-.pill::after {
-  opacity: 0;
-  background: conic-gradient(
-    from -75deg,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0.1) 20%,
-    rgba(255, 255, 255, 0.22) 50%,
-    rgba(255, 255, 255, 0.1) 75%,
-    rgba(255, 255, 255, 0.3)
-  );
-}
-
-/* dark glass: white .06 over a night tint, so white text holds even over a light edge */
+/* smoke glass: graphite over white (white text ≈ 7.8:1), near-black over the dark surfaces */
 .pill[data-tone="dark"] {
   color: #fff;
-  background-color: rgba(34, 37, 41, 0.7);
+  background-color: rgba(26, 29, 33, 0.72);
+  -webkit-backdrop-filter: blur(18px) brightness(0.9);
+  backdrop-filter: blur(18px) brightness(0.9);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 12px 1px rgba(255, 255, 255, 0.04),
+    inset 0 12px 16px -12px rgba(255, 255, 255, 0.14),
+    inset 0 -10px 16px -12px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
     0 1px 2px rgba(0, 0, 0, 0.2),
     0 18px 40px -18px rgba(0, 0, 0, 0.6);
-}
-.pill[data-tone="dark"]::before {
-  opacity: 0;
-}
-.pill[data-tone="dark"]::after {
-  opacity: 1;
 }
 
 /* focus ring follows the tone; pills keep their shape when focused */
@@ -181,6 +150,11 @@
   line-height: 1;
   white-space: nowrap;
   color: inherit;
+  /* a soft halo keeps the links clean when a heading slides (or warps) under the glass */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+.pill[data-tone="dark"] .link {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
 }
 /* 1px state underline: wipes in from the left, out to the right */
 .link::after {
@@ -230,7 +204,7 @@
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
-  color: var(--m-soft);
+  color: #2f343a; /* ≥ 5.8:1 on silver over the plate */
   background-color: rgba(255, 255, 255, 0);
   box-shadow: 0 0 0 0 rgba(20, 24, 28, 0);
   transition:
@@ -253,7 +227,7 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 .pill[data-tone="dark"] .seg button {
-  color: var(--m-dark-body);
+  color: #e3e6e9; /* ≥ 5:1 on smoke over white */
 }
 .pill[data-tone="dark"] .seg button:hover {
   color: #fff;
@@ -297,6 +271,17 @@
 }
 .pill[data-tone="dark"] .btn:hover::before {
   background: #fff;
+}
+/* in the dark tone the CTA is a white bead: give it the white bead rim */
+.pill[data-tone="dark"] .btn::after {
+  background: conic-gradient(
+    from -62deg,
+    #fff,
+    rgba(255, 255, 255, 0.4) 14% 36%,
+    #fff 50%,
+    rgba(20, 24, 28, 0.18) 64% 86%,
+    #fff
+  );
 }
 /* "Menu" / "Close": a quiet text button with a full 40px hit area */
 .menuBtn {
@@ -484,6 +469,16 @@
   }
 }
 
+/* Chromium + fine pointer: the old /jp warp on the light pill. The tint drops a little so the
+   warped page reads through; the smoke tone keeps its plain blur. */
+@media (hover: hover) and (pointer: fine) {
+  :global(html.lg-refract) .pill:not([data-tone="dark"]) {
+    background-color: rgba(255, 255, 255, 0.66);
+    -webkit-backdrop-filter: blur(3px) url(#lp-refract) brightness(1.05);
+    backdrop-filter: blur(3px) url(#lp-refract) brightness(1.05);
+  }
+}
+
 /* no backdrop blur available: near-solid fills so text never sits on busy content */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .pill {
@@ -499,8 +494,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pill,
-  .pill::before,
-  .pill::after,
   .lockupImg,
   .markImg,
   .link::after,

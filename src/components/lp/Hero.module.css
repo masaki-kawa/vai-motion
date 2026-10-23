@@ -43,3 +43,112 @@
     animation: none;
   }
 }
+
+/* ---- layout: phones stack plate → copy; from 900px the plate sits top-right, 12px from the
+   viewport edge, so the floating nav always straddles the white page and the dark plate ---- */
+.hero {
+  /* paper tint under the nav: a white glass pill only shows its lit rim against something
+     darker than white (dial: delete for a pure white top) */
+  background: linear-gradient(180deg, #eceef0 0px, #f4f5f6 140px, #fff 380px);
+}
+.grid {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 0;
+}
+.plate {
+  order: -1; /* DOM keeps the copy (H1) first for reading order */
+}
+.plate :global(.m-plate) {
+  /* phones: a tighter blur; at 3x a 90px blur rasters with visible tile seams under the plate */
+  box-shadow: 0 28px 44px -28px rgba(20, 24, 28, 0.5);
+}
+.copy {
+  padding: 32px 8px 0; /* 8 + 8 = the 16px phone gutter */
+}
+@media (min-width: 640px) {
+  .copy {
+    padding-inline: 24px; /* 8 + 24 = the 32px gutter */
+  }
+}
+@media (min-width: 900px) {
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min(50vw, 820px);
+    column-gap: clamp(32px, 4vw, 56px);
+    align-items: start;
+    /* % of the section width, so the copy lines up with every max-w-[1240px] px-8 container */
+    padding: 12px 12px 0 max(32px, calc((100% - 1176px) / 2));
+  }
+  .plate {
+    order: 0;
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .plate :global(.m-plate) {
+    box-shadow: 0 50px 90px -50px rgba(20, 24, 28, 0.55);
+  }
+  .copy {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 128px 0 0;
+  }
+}
+/* phones: the chip keeps line 1 only and tucks into the corner, so the nav plus the chip cover
+   under 40% of the 4:3 plate */
+@media (max-width: 559px) {
+  .plate :global(.m-chip) {
+    left: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
+    padding: 10px 14px;
+    border-radius: 14px;
+  }
+  .plate :global(.m-chip) > span + span {
+    display: none;
+  }
+}
+
+/* H1 sizes come from Hero.tsx as --h1-m / --h1-d */
+.title {
+  font-size: var(--h1-m);
+}
+@media (min-width: 900px) {
+  .title {
+    font-size: var(--h1-d);
+  }
+}
+/* JA lines never wrap, so 「。」 is never orphaned; --h1-d keeps each line inside the column */
+:global(html.lang-ja) .title :global(.m-line) {
+  white-space: nowrap;
+}
+
+/* ---- facts: a ruled list on phones; one hairline row of 2 → 4 columns on desktop ---- */
+.facts {
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.facts > li {
+  border-top: 1px solid var(--m-line);
+  padding: 14px 0;
+  font-size: 15px;
+}
+@media (min-width: 900px) {
+  .facts {
+    margin-top: 72px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 32px;
+  }
+  .facts > li {
+    border-top-color: var(--m-ink);
+    padding: 16px 0 0;
+    font-size: 14.5px;
+  }
+}
+@media (min-width: 1100px) {
+  .facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

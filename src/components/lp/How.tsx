@@ -162,7 +162,7 @@ export default function How() {
           >
             <a
               href="#contact"
-              className="m-btn m-btn--dark m-rim-dark h-[54px] w-full px-7 text-[15px] focus-visible:!rounded-full sm:w-auto"
+              className="m-btn m-btn--dark h-[54px] w-full px-7 text-[15px] focus-visible:!rounded-full sm:w-auto"
             >
               <span>{t("how.cta")}</span>
               <Arrow />

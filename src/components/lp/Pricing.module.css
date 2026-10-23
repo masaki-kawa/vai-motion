@@ -41,11 +41,6 @@
   --k: 0.42;
 }
 
-/* ---- Growth + Ads: the one dark card on the light section (#111417 body, faint top sheen) ---- */
-.dark.dark {
-  background: linear-gradient(180deg, #171a1e 0%, #111417 38%, #0f1215 100%);
-}
-
 /* desktop-only stagger for the right-hand card of a pair (on phones each card reveals alone) */
 .lag {
   --d: 0ms;

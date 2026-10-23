@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 /** Shared reveal hook: adds `.is-in` once the element is 20% in view (runs once).
  *  Under prefers-reduced-motion the element starts revealed. */
@@ -42,4 +42,19 @@ export function useReducedMotion() {
     return () => mq.removeEventListener("change", on);
   }, []);
   return reduced;
+}
+
+/** Sets data-paused on the element while it is off screen, so CSS loops behind glass
+ *  ([data-paused] .m-studio-pass / .m-stage-beams) stop costing frames. */
+export function usePauseOffscreen<T extends HTMLElement>(ref: RefObject<T | null>, enabled = true) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) el.removeAttribute("data-paused");
+      else el.setAttribute("data-paused", "");
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, enabled]);
 }

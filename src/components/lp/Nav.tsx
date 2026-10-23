@@ -18,9 +18,9 @@ const LANGS: Lang[] = ["en", "ja"];
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Floating monochrome glass pill. Light frosted glass by default; switches to dark glass
- * while the pill overlaps any [data-theme="dark"] element (a dark section, or the dark
- * Growth + Ads card even where it covers only part of the pill). Below 900px the links move into a
+ * Floating monochrome glass pill. Milk glass by default; switches to smoke glass while its
+ * centre line is over any [data-theme="dark"] surface (a dark section, the Growth + Ads card,
+ * the pricing stage). Below 900px the links move into a
  * full-screen frosted sheet (focus trapped, Esc closes) and the CTA hands over to MobileBar.
  */
 export default function Nav() {
@@ -42,9 +42,11 @@ export default function Nav() {
     return v === key ? (cur === "ja" ? ja : en) : v;
   };
 
-  // ---- tone: dark glass while the pill's own band overlaps any dark element ----
-  // Any overlap, not a majority: light glass over a dark card turns grey and the small
-  // toggle text drops below 4.5:1, while dark glass keeps white text >= 5.7:1 over white.
+  // ---- tone: smoke glass while the pill's centre line is over a [data-theme="dark"] surface
+  // (Budget slab, Growth card, pricing stage, Contact). The hero plate is deliberately NOT
+  // data-theme="dark": milk glass over it turns silver, which is the hero's whole point.
+  // Milk over dark keeps ink ≥ 9:1 and the toggle ≥ 5.8:1 (Nav.module.css), so a half
+  // overlap no longer has to force the dark tone, and the glass shows what is under it.
   useEffect(() => {
     const pill = pillRef.current;
     if (!pill) return;
@@ -56,10 +58,11 @@ export default function Nav() {
       raf = 0;
       io?.disconnect();
       hits.clear();
-      // rootMargin can't take calc(): isolate the pill's band (16→76px desktop, 12→68px phone)
-      // in px. Layout offsets, not getBoundingClientRect, so the entrance transform can't skew it.
-      const top = pill.offsetTop;
-      const bottom = Math.max(0, window.innerHeight - (top + pill.offsetHeight));
+      // a 2px band on the pill's centre line (rootMargin can't take calc(), so px). Layout
+      // offsets, not getBoundingClientRect, so the entrance transform can't skew it.
+      const mid = Math.round(pill.offsetTop + pill.offsetHeight / 2);
+      const top = Math.max(0, mid - 1);
+      const bottom = Math.max(0, window.innerHeight - top - 2);
       io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
@@ -244,7 +247,7 @@ export default function Nav() {
         ref={pillRef}
         aria-label={tx("nav.label", "Main", "メイン")}
         data-tone={dark ? "dark" : "light"}
-        className={`${s.pill} ${s.enter}`}
+        className={`${s.pill} ${s.enter} m-pill-rim`}
         inert={open}
       >
         <a href="#top" className={s.brand}>
@@ -294,7 +297,7 @@ export default function Nav() {
         className={s.sheet}
       >
         <div className={s.sheetTop}>
-          <div className={s.pill} data-tone="light">
+          <div className={`${s.pill} m-pill-rim`} data-tone="light">
             <a href="#top" className={s.brand} onClick={onSheetLink}>
               {logo}
             </a>

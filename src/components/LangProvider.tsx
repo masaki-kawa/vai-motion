@@ -42,24 +42,30 @@ export function LangProvider({
       window.localStorage.setItem(STORAGE_KEY, lang);
     } catch {}
     // persist to a cookie so the next server render starts in the right language (no flash)
-    document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
+    try {
+      document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
+    } catch {}
     applyHtml(lang);
     // reflect in the URL without a navigation
-    const u = new URL(window.location.href);
-    u.searchParams.set("lang", lang);
-    window.history.replaceState({}, "", u);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set("lang", lang);
+      window.history.replaceState(window.history.state, "", u);
+    } catch {}
   }, []);
 
   // The server already rendered `initialLang` (and layout set the <html> class from the cookie).
   // On mount, reconcile the class with what we hold and migrate older localStorage-only prefs.
   useEffect(() => {
     applyHtml(cur);
-    const hasCookie =
-      typeof document !== "undefined" && document.cookie.includes(`${LANG_COOKIE}=`);
-    if (!hasCookie) {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
-      if ((saved === "en" || saved === "ja") && saved !== cur) setLang(saved);
-    }
+    // storage and cookies can throw (blocked site data, sandboxed frames); the page works without them
+    try {
+      const hasCookie = document.cookie.includes(`${LANG_COOKIE}=`);
+      if (!hasCookie) {
+        const saved = window.localStorage.getItem(STORAGE_KEY);
+        if ((saved === "en" || saved === "ja") && saved !== cur) setLang(saved);
+      }
+    } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

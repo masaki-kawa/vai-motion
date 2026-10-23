@@ -20,10 +20,13 @@ import type { Lang } from "@/lib/i18n";
 import { cookies } from "next/headers";
 import { LANG_COOKIE, normalizeLang } from "@/lib/lang";
 
-/** Chromium only (navigator.userAgentData brands): turns on the url(#lp-refract) backdrop
- *  refraction. Safari / iOS (Chrome on iOS included) and Firefox never get the class, so they
- *  never see a url() filter. ?webkit forces the WebKit path in Chromium, for screenshots. */
-const REFRACT = `(function(d){try{var b=navigator.userAgentData&&navigator.userAgentData.brands;if(b&&b.some(function(x){return x.brand==="Chromium"})&&!/[?&]webkit\\b/.test(location.search))d.classList.add("lg-refract")}catch(e){}})(document.documentElement)`;
+/** Chromium only, desktop and Android: turns on the url(#lp-refract) backdrop refraction (the
+ *  old /jp nav's warp). A "Chromium" userAgentData brand, or (no client hints: an insecure
+ *  context, a fork without the brand) a Google vendor plus a Chrome/ UA that is not an iOS
+ *  wrapper. The vendor check keeps out WebKit sending a spoofed Chrome UA. Safari, every iOS
+ *  browser and Firefox never get the class, so they never see a url() filter (WebKit drops
+ *  the whole backdrop filter when it has one). ?webkit forces the WebKit path, for screenshots. */
+const REFRACT = `(function(d){try{var n=navigator,b=n.userAgentData&&n.userAgentData.brands,u=n.userAgent||"",c=(b&&b.some&&b.some(function(x){return x.brand==="Chromium"}))||(n.vendor==="Google Inc."&&/\\b(Headless)?Chrome\\/\\d/.test(u)&&!/\\b(CriOS|EdgiOS|FxiOS|OPiOS)\\b/.test(u));if(c&&!/[?&]webkit\\b/.test(location.search))d.classList.add("lg-refract")}catch(e){}})(document.documentElement)`;
 
 type Props = { searchParams: Promise<{ lang?: string }> };
 

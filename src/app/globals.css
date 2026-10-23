@@ -744,7 +744,7 @@ html.lang-ja .m-body {
    One structure, applied to the glass element itself:
      background        tint (+ a top-lit sheen layer)
      backdrop-filter   blur / brightness only: WebKit-safe. The SVG refraction is added
-                       separately, only under html.lg-refract (Chromium, fine pointer).
+                       separately, only under html.lg-refract (Chromium, desktop and Android).
      box-shadow        inner light (top line, edge glow, top falloff, bottom shade) + drop
      ::before          1px specular rim (masked conic ring). The material owns its rim:
                        never combine .m-glass* / .m-chip--* with .m-rim / .m-rim-dark.
@@ -904,13 +904,10 @@ html.lang-ja .m-body {
 }
 
 /* ---- Chromium-only refraction (the old /jp warp). html.lg-refract comes from the inline
-   script in app/page.tsx (navigator.userAgentData reports Chromium). Fine pointers only:
-   phones, Android Chrome included, stay on plain blur. WebKit never sees a url() filter. ---- */
-@media (hover: hover) and (pointer: fine) {
-  html.lg-refract .m-chip--light.m-lens {
-    -webkit-backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
-    backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
-  }
+   script in app/page.tsx (Chromium, desktop and Android). WebKit never sees a url() filter. ---- */
+html.lg-refract .m-chip--light.m-lens {
+  -webkit-backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
+  backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
 }
 
 /* ---- buttons: solid glass beads (no backdrop-filter, so they cost nothing and can sit
@@ -1094,9 +1091,17 @@ html.lang-ja .m-body {
     linear-gradient(180deg, #1b1d20 0%, #101113 calc(var(--hz) - 0.5%), #060708 var(--hz), #0b0c0d 100%);
 }
 @media (min-width: 900px) {
+  /* the line runs through the nav's free glass, between the links and EN | 日本語, on a
+     column where #lp-refract bends it, so the header shows the bend even at rest. Fitted to
+     the measured gap (EN and JA links differ in width) from about 1100px up; the pill-relative
+     column is constant from 1152px. Narrower, the gap is too tight and the line may pass under
+     the toggle. Re-measure if the pill's width, shadow or links change. */
   .m-studio {
     --hz: 62%;
-    --tx: 57%;
+    --tx: max(8%, min(258px, 1080px - 50vw, 25vw - 28px));
+  }
+  html.lang-ja .m-studio {
+    --tx: max(8%, min(268px, 1088px - 50vw, 25vw + 12px));
   }
 }
 .m-studio-floor {

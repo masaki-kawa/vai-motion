@@ -26,6 +26,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 export default function Nav() {
   const { t, cur, setLang } = useT();
   const [dark, setDark] = useState(false);
+  const [overPlate, setOverPlate] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -47,17 +48,23 @@ export default function Nav() {
   // data-theme="dark": milk glass over it turns silver, which is the hero's whole point.
   // Milk over dark keeps ink ≥ 9:1 and the toggle ≥ 5.8:1 (Nav.module.css), so a half
   // overlap no longer has to force the dark tone, and the glass shows what is under it.
+  // A second observer, over the pill's whole height, reports image plates (data-over="plate"):
+  // the Chromium refraction thins the milk, and it thickens back over pictures.
   useEffect(() => {
     const pill = pillRef.current;
     if (!pill) return;
     const hits = new Set<Element>();
+    const plates = new Set<Element>();
     let io: IntersectionObserver | null = null;
+    let plateIo: IntersectionObserver | null = null;
     let raf = 0;
 
     const build = () => {
       raf = 0;
       io?.disconnect();
+      plateIo?.disconnect();
       hits.clear();
+      plates.clear();
       // a 2px band on the pill's centre line (rootMargin can't take calc(), so px). Layout
       // offsets, not getBoundingClientRect, so the entrance transform can't skew it.
       const mid = Math.round(pill.offsetTop + pill.offsetHeight / 2);
@@ -74,6 +81,36 @@ export default function Nav() {
         { rootMargin: `-${top}px 0px -${bottom}px 0px` },
       );
       document.querySelectorAll('[data-theme="dark"]').forEach((el) => io!.observe(el));
+
+      // plates: the pill's whole height, so the thicker milk is already on when a picture's
+      // edge first slides under the links (over white page it is invisible anyway)
+      const pTop = pill.offsetTop;
+      const pBottom = Math.max(0, window.innerHeight - pTop - pill.offsetHeight);
+      plateIo = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) plates.add(e.target);
+            else plates.delete(e.target);
+          }
+          setOverPlate(plates.size > 0);
+          if (plates.size) {
+            // the plates' horizontal span on the pill: the thicker milk covers only that.
+            // Horizontal geometry doesn't change on scroll, so measuring here is enough.
+            const pr = pill.getBoundingClientRect();
+            let l = Infinity;
+            let r = -Infinity;
+            plates.forEach((el) => {
+              const b = el.getBoundingClientRect();
+              l = Math.min(l, b.left);
+              r = Math.max(r, b.right);
+            });
+            pill.style.setProperty("--plate-l", `${Math.max(0, Math.round(l - pr.left))}px`);
+            pill.style.setProperty("--plate-r", `${Math.min(pr.width, Math.round(r - pr.left))}px`);
+          }
+        },
+        { rootMargin: `-${pTop}px 0px -${pBottom}px 0px` },
+      );
+      document.querySelectorAll(".m-plate").forEach((el) => plateIo!.observe(el));
     };
     const onResize = () => {
       if (!raf) raf = requestAnimationFrame(build);
@@ -85,6 +122,7 @@ export default function Nav() {
       window.removeEventListener("resize", onResize);
       if (raf) cancelAnimationFrame(raf);
       io?.disconnect();
+      plateIo?.disconnect();
     };
   }, []);
 
@@ -247,6 +285,7 @@ export default function Nav() {
         ref={pillRef}
         aria-label={tx("nav.label", "Main", "メイン")}
         data-tone={dark ? "dark" : "light"}
+        data-over={overPlate ? "plate" : undefined}
         className={`${s.pill} ${s.enter} m-pill-rim`}
         inert={open}
       >

@@ -222,9 +222,11 @@
     0 1px 2px rgba(20, 24, 28, 0.1),
     0 3px 10px -3px rgba(20, 24, 28, 0.16);
 }
+/* a dark track of its own: over light content seen through the smoke (form fields, white
+   buttons) the pressed label would otherwise drop near 4:1 */
 .pill[data-tone="dark"] .seg {
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+  background-color: rgba(20, 24, 28, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .pill[data-tone="dark"] .seg button {
   color: #e3e6e9; /* ≥ 5:1 on smoke over white */
@@ -469,14 +471,83 @@
   }
 }
 
-/* Chromium + fine pointer: the old /jp warp on the light pill. The tint drops a little so the
-   warped page reads through; the smoke tone keeps its plain blur. */
-@media (hover: hover) and (pointer: fine) {
-  :global(html.lg-refract) .pill:not([data-tone="dark"]) {
-    background-color: rgba(255, 255, 255, 0.66);
-    -webkit-backdrop-filter: blur(3px) url(#lp-refract) brightness(1.05);
-    backdrop-filter: blur(3px) url(#lp-refract) brightness(1.05);
-  }
+/* ---- Chromium (html.lg-refract, desktop and Android): the old /jp warp. The page behind the
+   pill shows through, bent by #lp-refract, so the tint drops until it reads clearly; a white
+   halo keeps the links clean over warped headings. Over a picture (data-over="plate", e.g. the
+   hero) the milk thickens to ≈ .55 so ink text keeps ≥ 6:1 even where the halo thins, but only across the
+   picture's own span (--plate-l / --plate-r, set by Nav.tsx), so a headline beside it still
+   bends at full strength. The smoke tone warps too, a little thicker so white text over light
+   cards and form fields keeps ≥ 6:1. Safari, iOS and Firefox never get the class and keep the
+   frosted blur above. ---- */
+@property --plate-a {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+:global(html.lg-refract) .pill {
+  --plate-a: 0;
+  background-color: rgba(255, 255, 255, 0.36);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) calc(var(--plate-l, 0px) - 32px),
+    rgba(255, 255, 255, var(--plate-a)) var(--plate-l, 0px),
+    rgba(255, 255, 255, var(--plate-a)) var(--plate-r, 100%),
+    rgba(255, 255, 255, 0) calc(var(--plate-r, 100%) + 32px)
+  );
+  -webkit-backdrop-filter: blur(2px) url(#lp-refract) brightness(1.05);
+  backdrop-filter: blur(2px) url(#lp-refract) brightness(1.05);
+  transition:
+    background-color var(--tone) var(--m-ease),
+    --plate-a var(--tone) var(--m-ease),
+    box-shadow var(--tone) var(--m-ease),
+    color var(--tone) var(--m-ease);
+}
+:global(html.lg-refract) .pill[data-over="plate"] {
+  --plate-a: 0.3;
+}
+:global(html.lg-refract) .pill[data-tone="dark"] {
+  --plate-a: 0;
+  background-color: rgba(24, 27, 31, 0.62);
+  -webkit-backdrop-filter: blur(2px) url(#lp-refract) brightness(0.85);
+  backdrop-filter: blur(2px) url(#lp-refract) brightness(0.85);
+}
+:global(html.lg-refract) .pill .link,
+:global(html.lg-refract) .pill .menuBtn {
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.9),
+    0 0 16px rgba(255, 255, 255, 0.7);
+}
+:global(html.lg-refract) .pill[data-tone="dark"] .link,
+:global(html.lg-refract) .pill[data-tone="dark"] .menuBtn {
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(0, 0, 0, 0.7);
+}
+/* the logo gets the same halo (a filter on the link, outside the lockup's crop box) */
+:global(html.lg-refract) .pill .brand {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 7px rgba(255, 255, 255, 0.75));
+  transition: filter var(--tone) var(--m-ease);
+}
+:global(html.lg-refract) .pill[data-tone="dark"] .brand {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 7px rgba(0, 0, 0, 0.55));
+}
+/* the toggle and the phone メニュー button get their own frosted tracks, so their labels
+   never sit on bare warped text */
+:global(html.lg-refract) .pill:not([data-tone="dark"]) .seg,
+:global(html.lg-refract) .pill:not([data-tone="dark"]) .menuBtn {
+  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(20, 24, 28, 0.06);
+}
+:global(html.lg-refract) .pill:not([data-tone="dark"]) .menuBtn:hover {
+  background-color: rgba(255, 255, 255, 0.72);
+}
+:global(html.lg-refract) .pill[data-tone="dark"] .menuBtn {
+  background-color: rgba(20, 24, 28, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+:global(html.lg-refract) .pill[data-tone="dark"] .menuBtn:hover {
+  background-color: rgba(20, 24, 28, 0.66);
 }
 
 /* no backdrop blur available: near-solid fills so text never sits on busy content */

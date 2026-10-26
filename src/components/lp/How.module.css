@@ -63,7 +63,7 @@
 }
 
 .label {
-  transition: color 0.5s ease;
+  transition: color 0.5s var(--m-ease);
   transition-delay: var(--fd, 0ms);
 }
 .step[data-on] .label {
@@ -131,9 +131,14 @@
   overflow-wrap: anywhere;
 }
 
-/* ---- the owner's part: 21px on phones, then the spec's fluid size ---- */
+/* ---- the owner's part: 20px on phones (JA 21px), then the spec's fluid size ---- */
 .close {
-  font-size: 21px;
+  font-size: 20px;
+}
+@media (max-width: 899px) {
+  :global(html.lang-ja) .close {
+    font-size: 21px;
+  }
 }
 @media (min-width: 900px) {
   .close {

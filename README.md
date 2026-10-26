@@ -17,17 +17,18 @@ npm run dev      # http://localhost:3000
 npm run build    # production build
 ```
 
-`?lang=ja` (or the EN/日本語 toggle) switches language. The choice persists to a `vai_lang` cookie (+ `localStorage` + the URL); the cookie lets the **server render the right language with no flash** and makes each language crawlable.
+`?lang=ja` (or the EN/日本語 toggle) switches language. The choice persists to a `vai_lang` cookie (+ `localStorage` + the URL); the cookie lets the **server render the right language with no flash** and makes each language crawlable. A first visit with no cookie opens in Japanese when the browser's first language is Japanese (`Accept-Language`), otherwise in English.
 
 ### Environment (contact form)
 
-The contact form posts to `/api/contact`. With no provider configured it validates + logs the enquiry (nothing is delivered). To deliver via [Resend](https://resend.com):
+The contact form posts to `/api/contact`, which sends each enquiry to a Slack channel through an Incoming Webhook:
 
 ```bash
-RESEND_API_KEY=re_...                 # Resend API key
-CONTACT_TO=hello@vaimotion.com        # where enquiries are sent
-CONTACT_FROM="VAI MOTION <hello@vaimotion.com>"  # optional, must be a verified sender
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...   # Slack → Apps → Incoming Webhooks
+NEXT_PUBLIC_SITE_URL=https://www.example.com             # the production domain (canonical, hreflang, og:url, sitemap)
 ```
+
+Without `SLACK_WEBHOOK_URL`, development validates and logs the enquiry; **production returns an error** so the form never thanks someone whose message went nowhere. After deploying, send one test enquiry through the live form and check that it arrives.
 
 ## Structure
 
@@ -76,12 +77,12 @@ public/assets/        logos, category videos (mp4) + posters
 - **Performance** — assets compressed (78 MB → 14 MB): posters → optimized JPEG (≤104 KB), videos → 720p/1080p **H.264 / AAC mp4**, `preload` none (hero) / metadata (work). (WebM/VP9 was dropped: for these short clips it was *larger* than the mp4 and Safari couldn't play its Opus audio.)
 - **Recent Work player** — native `<video controls>` is replaced with a custom minimal bar (play/pause · seek · mute toggle) because the native controls exposed an unwanted fullscreen button + overflow (⋮) menu and a flaky/disabled volume control. Sound is **on by default** (`muted=false`, set imperatively to dodge React's unreliable `muted` prop); audio confirmed decoding (AAC-LC 48 kHz stereo).
 - **Accessibility** — skip link, keyboard-operable hero video cards (`role="button"` + Enter/Space), `aria-pressed` language toggle, `aria-expanded` menu, `role="radiogroup"`, `aria-label`ed videos.
-- **SEO** — Open Graph + Twitter card (`/og.jpg`), `hreflang` en/ja alternates, canonical, favicon (`vai-mark.png`).
+- **SEO** — Open Graph + Twitter card (`/og-lp.jpg`, `/og-lp-ja.jpg`; `/og.jpg` for /jp), `hreflang` en/ja/x-default alternates, canonical, `sitemap.xml` + `robots.txt`, Organization + FAQ JSON-LD, favicon + Apple icon (`app/icon.png`, `app/apple-icon.png`), a 404 page in both languages.
 - **No locale flash** — language resolved server-side from the `vai_lang` cookie (see Run).
 - **Smooth nav morph** — the full-width bar → floating pill transition rides a single progress var `--p` (0→1). `--p` is a *registered* `@property`, so flipping it via a scroll threshold (`.is-scrolled`, with hysteresis) eases it over one `cubic-bezier` curve, and every nav property (width, radius, top margin, background, blur, shadow, rim/link/logo opacity) interpolates from it with `calc()` — one silky eased motion. (The original snapped because `max-width: none → 960px` isn't interpolatable; a first rewrite was scroll-linked per-frame, which janked from layout reflow on every scroll event. This eased-threshold version avoids both.)
-- **Contact endpoint** — `/api/contact` (validates, pluggable Resend delivery).
+- **Contact endpoint** — `/api/contact` (validates, delivers to Slack via `SLACK_WEBHOOK_URL`).
 
 ## TODO before launch
 
-- Set `RESEND_API_KEY` + `CONTACT_TO` to actually deliver contact enquiries (endpoint already wired).
-- Confirm the real contact address and the production domain (`vaimotion.com` is a placeholder in `metadataBase`).
+- Set `SLACK_WEBHOOK_URL` so contact enquiries are delivered, then send one test enquiry through the live form.
+- Set `NEXT_PUBLIC_SITE_URL` to the production domain (`vaimotion.com` is a placeholder) and confirm the public contact address.

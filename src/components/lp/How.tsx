@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useT } from "../LangProvider";
 import Html from "./Html";
-import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
+import { bindLastWords, bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./How.module.css";
 
@@ -100,7 +100,7 @@ export default function How() {
 
   return (
     <section id="how" aria-labelledby="how-title" className="relative bg-white">
-      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8 min-[900px]:pb-[160px] min-[900px]:pt-[160px]">
+      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8">
         {/* ---- header: columns 1–9 ---- */}
         <div ref={head.ref} className="min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
           <div className="min-[900px]:col-span-9">
@@ -111,7 +111,7 @@ export default function How() {
               id="how-title"
               html={t("how.title")}
               cls={head.cls}
-              className="m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-6"
+              className="m-display m-jp-break mt-6 text-[color:var(--m-ink)]"
               style={{
                 fontSize: ja ? "clamp(30px,4.2vw,64px)" : "clamp(36px,5vw,76px)",
                 lineHeight: ja ? 1.25 : 1.02,
@@ -120,7 +120,7 @@ export default function How() {
               }}
             />
             <p
-              className={`m-body m-reveal mt-6 max-w-[36em] text-[17px] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-8 ${head.cls}`}
+              className={`m-body m-reveal mt-6 max-w-[36em] ${ja ? "text-[17px]" : "text-base"} text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-8 ${head.cls}`}
               style={delay("calc(var(--title-end, 240ms) + 120ms)")}
             >
               {t("how.sub")}
@@ -131,7 +131,7 @@ export default function How() {
         {/* ---- the five steps under one track ---- */}
         <ol
           ref={listRef}
-          className={`${s.steps} mt-14 min-[900px]:mt-24 min-[900px]:grid min-[900px]:grid-cols-5`}
+          className={`${s.steps} mt-12 min-[900px]:mt-24 min-[900px]:grid min-[900px]:grid-cols-5`}
           style={{ "--progress": prog.n / STEPS.length } as CSSProperties}
         >
           {STEPS.map((n, i) => (
@@ -162,7 +162,7 @@ export default function How() {
           >
             <a
               href="#contact"
-              className="m-btn m-btn--dark h-[54px] w-full px-7 text-[15px] focus-visible:!rounded-full sm:w-auto"
+              className="m-btn m-btn--dark min-h-12 w-full px-6 py-3 text-base focus-visible:!rounded-full sm:w-auto"
             >
               <span>{t("how.cta")}</span>
               <Arrow />
@@ -193,7 +193,7 @@ function Step({ n, index, on, fd }: { n: number; index: number; on: boolean; fd:
       <div className={`${s.content} m-reveal ${cls}`} style={{ "--sd": `${index * 90}ms` } as CSSProperties}>
         <p
           className={`${s.label} tabular font-semibold text-[color:var(--m-mute)] ${
-            ja ? "text-[13px] tracking-[0.06em]" : "text-[12px] uppercase tracking-[0.14em]"
+            ja ? "text-[13px] tracking-[0.06em]" : "text-xs uppercase tracking-[0.14em]"
           }`}
           style={{ lineHeight: 1.4 }}
         >
@@ -204,13 +204,16 @@ function Step({ n, index, on, fd }: { n: number; index: number; on: boolean; fd:
         <Html
           as="h3"
           html={ja ? t(`how.${n}.title`) : bindShortWords(t(`how.${n}.title`))}
-          className={`mt-2.5 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-3.5 min-[1100px]:text-[21px] ${
-            ja ? `${s.jaPhrase} text-[18px] min-[900px]:text-[17px]` : "text-[19px]"
+          className={`mt-2 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-3 ${
+            ja ? `${s.jaPhrase} text-[18px] min-[900px]:text-[17px] min-[1100px]:text-[21px]` : "text-lg min-[1100px]:text-xl"
           }`}
           style={{ lineHeight: ja ? 1.5 : 1.3, letterSpacing: ja ? "0" : "-0.015em" }}
         />
-        <p className="m-body mt-2.5 max-w-[34em] text-[15px] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-3">
-          {t(`how.${n}.body`)}
+        <p
+          className={`m-body mt-2 max-w-[34em] ${ja ? "text-[15px]" : "text-sm"} text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-3`}
+        >
+          {/* EN: the last two words stay together, so no word sits alone on the last line */}
+          {ja ? t(`how.${n}.body`) : bindLastWords(t(`how.${n}.body`))}
         </p>
       </div>
     </li>

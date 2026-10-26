@@ -46,19 +46,18 @@
     inset 0 -1px 0 rgba(20, 24, 28, 0.05),
     0 1px 2px rgba(20, 24, 28, 0.05),
     0 16px 36px -16px rgba(20, 24, 28, 0.28);
+  /* the tint and ink cross-fade carry the tone change; the blur step itself is not animated */
   transition:
     background-color var(--tone) var(--m-ease),
     box-shadow var(--tone) var(--m-ease),
-    color var(--tone) var(--m-ease),
-    -webkit-backdrop-filter var(--tone) var(--m-ease),
-    backdrop-filter var(--tone) var(--m-ease);
+    color var(--tone) var(--m-ease);
 }
 .enter {
   animation: navIn 0.7s var(--m-ease) 0.08s backwards;
 }
 @keyframes navIn {
   from {
-    transform: translate3d(0, -14px, 0);
+    transform: translate(0, -14px);
   }
 }
 
@@ -174,6 +173,12 @@
   transform: scaleX(1);
   transform-origin: left center;
 }
+/* pressed */
+.link:active,
+.seg button:active,
+.menuBtn:active {
+  transform: translateY(1px);
+}
 
 /* ---- right cluster ---- */
 .actions {
@@ -245,7 +250,7 @@
 /* dark pill CTA / Menu button that inverts to a white pill on dark glass */
 .btn {
   height: 40px;
-  padding: 0 18px;
+  padding: 0 16px;
   font-size: 14px;
   transition:
     transform 0.35s var(--m-ease),
@@ -285,10 +290,17 @@
     #fff
   );
 }
+/* narrow desktops: the pill's three columns are tight with the longer CTA label */
+@media (min-width: 900px) and (max-width: 1023px) {
+  .btn {
+    padding: 0 14px;
+  }
+}
 /* "Menu" / "Close": a quiet text button with a full 40px hit area */
 .menuBtn {
   display: none;
   align-items: center;
+  gap: 8px;
   height: 40px;
   padding: 0 12px;
   border-radius: 999px;
@@ -308,6 +320,30 @@
 }
 :global(html.lang-ja) .menuBtn {
   font-size: 13px;
+}
+/* two strokes that turn into a cross while the sheet is open (both buttons carry them, so the
+   cross-fade between the pill and the sheet reads as one glyph turning) */
+.lines {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 16px;
+}
+.lines i {
+  display: block;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.5s var(--m-ease);
+}
+.menuBtn[aria-expanded="true"] .lines i:first-child,
+.sheet[data-open="true"] .menuBtn .lines i:first-child {
+  transform: translate(0, 3.25px) rotate(45deg);
+}
+.menuBtn[aria-expanded="true"] .lines i:last-child,
+.sheet[data-open="true"] .menuBtn .lines i:last-child {
+  transform: translate(0, -3.25px) rotate(-45deg);
 }
 .pill .menuBtn:focus-visible {
   border-radius: 999px;
@@ -393,7 +429,7 @@
 /* items rise in a short stagger when the sheet opens; they leave together */
 .rise {
   opacity: 0;
-  transform: translate3d(0, 14px, 0);
+  transform: translate(0, 24px);
   transition:
     opacity 0.3s var(--m-ease),
     transform 0.3s var(--m-ease);
@@ -402,9 +438,10 @@
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.55s var(--m-ease),
-    transform 0.7s var(--m-ease);
-  transition-delay: calc(80ms + var(--i, 0) * 40ms);
+    opacity 0.5s var(--m-ease),
+    transform 0.5s var(--m-ease);
+  /* six items, 60ms apart: the last one starts at 300ms */
+  transition-delay: calc(var(--i, 0) * 60ms);
 }
 
 /* ---- phones ---- */
@@ -667,7 +704,8 @@
   .sheet,
   .sheet[data-open="true"],
   .rise,
-  .sheet[data-open="true"] .rise {
+  .sheet[data-open="true"] .rise,
+  .lines i {
     transition: none !important;
   }
   .enter {

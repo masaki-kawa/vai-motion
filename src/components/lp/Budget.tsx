@@ -119,11 +119,11 @@ export default function Budget() {
       id="budget"
       data-theme="dark"
       aria-labelledby="budget-title"
-      className={`m-rim-dark relative m-2 rounded-[28px] text-white min-[900px]:m-3 min-[900px]:rounded-[40px] ${s.slab} ${
+      className={`m-rim-dark relative m-2 rounded-4xl text-white min-[900px]:m-3 min-[900px]:rounded-5xl ${s.slab} ${
         armed ? s.armed : ""
       }`}
     >
-      <div className="mx-auto max-w-[1240px] px-4 pb-20 pt-[88px] sm:px-8 min-[900px]:pb-[120px] min-[900px]:pt-[140px]">
+      <div className="mx-auto max-w-[1240px] px-4 pb-20 pt-20 sm:px-8 min-[900px]:pb-24 min-[900px]:pt-24">
         {/* ---- header: columns 1–9 ---- */}
         <div ref={head.ref} className={`min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 ${head.cls}`}>
           <div className="min-[900px]:col-span-9">
@@ -138,7 +138,7 @@ export default function Budget() {
             <h2
               ref={titleRef}
               id="budget-title"
-              className="m-display m-jp-break mt-5 text-white min-[900px]:mt-6"
+              className="m-display m-jp-break mt-6 text-white"
               style={{
                 fontSize: ja ? "clamp(28px,3.8vw,56px)" : "clamp(34px,4.6vw,68px)",
                 lineHeight: ja ? 1.3 : 1.04,
@@ -177,7 +177,9 @@ export default function Budget() {
           <BigNumber value={SPEND} cur={cur} />
           <span className="sr-only">{`${t("bud.big")} `}</span>
           <span
-            className={`max-w-[18em] text-[18px] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:max-w-[20em] min-[900px]:text-[20px] ${s.caption}`}
+            className={`max-w-[18em] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:max-w-[20em] ${
+              ja ? "text-[18px] min-[900px]:text-[20px]" : "text-lg min-[900px]:text-xl"
+            } ${s.caption}`}
             style={{ lineHeight: ja ? 1.75 : 1.5, ...(ja ? JA_PHRASE : {}) }}
           >
             {t("bud.big.caption")}
@@ -198,9 +200,9 @@ export default function Budget() {
             <Row label={t("bud.b.label")} aria={t("bud.b.aria")} cols={COLS_B} segs={segB} outcome={t("bud.b.outcome")} />
           </div>
 
-          <div aria-hidden="true" className="mt-12 min-[900px]:mt-14">
+          <div aria-hidden="true" className="mt-12 min-[900px]:mt-16">
             <div className="h-px bg-[rgba(255,255,255,0.14)]" />
-            <div className="tabular mt-3 flex justify-between gap-4 text-[12px] leading-[1.4] text-[#A7ADB3]">
+            <div className="tabular mt-3 flex justify-between gap-4 text-xs leading-[1.4] text-[#A7ADB3]">
               <span>{t("bud.axis.min")}</span>
               <span>{t("bud.axis.max")}</span>
             </div>
@@ -209,7 +211,7 @@ export default function Budget() {
 
         {/* always visible, right beside the example */}
         <p
-          className="mt-10 max-w-[60em] text-[14px] text-[#A7ADB3] [text-wrap:pretty] min-[900px]:mt-12"
+          className="mt-10 max-w-[60em] text-sm text-[#A7ADB3] [text-wrap:pretty] min-[900px]:mt-12"
           style={{ lineHeight: ja ? 1.9 : 1.7 }}
         >
           {t("bud.note")}
@@ -222,7 +224,7 @@ export default function Budget() {
 /** The ad-spend number, always the real amount. When armed it rises in its own mask with the row. */
 function BigNumber({ value, cur }: { value: number; cur: Lang }) {
   return (
-    <span aria-hidden="true" className={`tabular font-extrabold text-white ${s.num}`}>
+    <span aria-hidden="true" className={`tabular font-bold text-white ${s.num}`}>
       <span style={delay(NUM_LAG)}>
         <Amount value={value} cur={cur} />
       </span>
@@ -270,7 +272,7 @@ function Row({
       <p
         aria-hidden="true"
         className={`mb-3 font-semibold text-[#A7ADB3] min-[900px]:mb-4 ${
-          ja ? "text-[13px] tracking-[0.06em]" : "text-[12px] uppercase tracking-[0.14em]"
+          ja ? "text-[13px] tracking-[0.06em]" : "text-xs uppercase tracking-[0.14em]"
         }`}
         style={{ lineHeight: 1.5 }}
       >
@@ -313,9 +315,9 @@ function Row({
         ) : null}
       </div>
 
-      <div className={`mt-4 min-[900px]:mt-5 ${ads ? s.meta : ""}`}>
+      <div className={`mt-4 min-[900px]:mt-6 ${ads ? s.meta : ""}`}>
         <p
-          className="max-w-[46em] text-[16px] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:[text-wrap:balance]"
+          className="max-w-[46em] text-base text-[#C4C8CC] [text-wrap:pretty] min-[900px]:[text-wrap:balance]"
           style={{ lineHeight: ja ? 1.9 : 1.7, ...(ja ? JA_PHRASE : {}) }}
         >
           {outcome}

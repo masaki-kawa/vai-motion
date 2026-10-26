@@ -75,7 +75,7 @@ export default function Idea() {
 
   return (
     <section id="idea" aria-labelledby="idea-title" className="relative bg-white">
-      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8 min-[900px]:pb-[120px] min-[900px]:pt-[160px]">
+      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8">
         {/* ---- header: columns 1–9 ---- */}
         <div ref={head.ref} className="min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
           <div className="min-[900px]:col-span-9">
@@ -89,7 +89,7 @@ export default function Idea() {
             <h2
               ref={titleRef}
               id="idea-title"
-              className={`m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-6 ${s.title} ${head.cls}`}
+              className={`m-display m-jp-break mt-6 text-[color:var(--m-ink)] ${s.title} ${head.cls}`}
               style={{
                 fontSize: ja ? "clamp(30px,4.4vw,68px)" : "clamp(36px,5.2vw,80px)",
                 lineHeight: ja ? 1.25 : 1.02,
@@ -123,7 +123,9 @@ export default function Idea() {
 
             <p
               ref={leadRef}
-              className={`m-body m-reveal mt-6 max-w-[34em] text-[17px] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:text-[19px] ${head.cls}`}
+              className={`m-body m-reveal mt-6 max-w-[34em] text-[color:var(--m-soft)] [text-wrap:pretty] ${
+                ja ? "text-[17px] min-[900px]:text-[19px]" : "text-base min-[900px]:text-lg"
+              } ${head.cls}`}
               style={delay(320)}
             >
               {t("idea.lead")}
@@ -132,7 +134,7 @@ export default function Idea() {
         </div>
 
         {/* ---- claims (1–7) and the sticky plate (9–12) ---- */}
-        <div className="mt-14 min-[900px]:mt-24 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
+        <div className="mt-12 min-[900px]:mt-24 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
           <Claim n={1} />
 
           <div className="mb-10 min-[900px]:sticky min-[900px]:top-[120px] min-[900px]:col-span-4 min-[900px]:col-start-9 min-[900px]:row-span-3 min-[900px]:row-start-1 min-[900px]:mb-0 min-[900px]:self-start">
@@ -172,14 +174,14 @@ function Claim({ n }: { n: ClaimNo }) {
 
       <h3
         className={`m-reveal ${cls} flex items-baseline gap-3 font-semibold text-[color:var(--m-mute)] ${
-          ja ? "text-[13px] tracking-[0.06em]" : "text-[12px] uppercase tracking-[0.14em]"
+          ja ? "text-[13px] tracking-[0.06em]" : "text-xs uppercase tracking-[0.14em]"
         }`}
         style={delay(0)}
       >
         <span>{t(`idea.${n}.label`)}</span>
       </h3>
 
-      <div className={`m-reveal ${cls} mt-4 min-[900px]:mt-5`} style={delay(90)}>
+      <div className={`m-reveal ${cls} mt-4 min-[900px]:mt-6`} style={delay(90)}>
         {/* EN: one- and two-letter words travel with the next word, so none dangles at a line end */}
         <Html
           as="p"
@@ -195,7 +197,7 @@ function Claim({ n }: { n: ClaimNo }) {
       </div>
 
       <p
-        className={`m-reveal ${cls} mt-5 max-w-[34em] text-[17px] text-[color:var(--m-soft)] [text-wrap:pretty]`}
+        className={`m-reveal ${cls} mt-4 max-w-[34em] ${ja ? "text-[17px]" : "text-base"} text-[color:var(--m-soft)] [text-wrap:pretty]`}
         style={{ ...delay(180), lineHeight: ja ? 1.9 : 1.75 }}
       >
         {t(`idea.${n}.body`)}

@@ -166,10 +166,15 @@ export async function POST(req: Request) {
       console.error("contact: Slack send failed", e);
       return NextResponse.json({ ok: false, error: "send" }, { status: 502 });
     }
+  } else if (process.env.NODE_ENV === "production") {
+    // In production a missing webhook must not look like success: the form shows its
+    // "not sent, try again" message instead of thanking someone whose enquiry went nowhere.
+    console.error("contact: SLACK_WEBHOOK_URL is not set; enquiry not delivered");
+    return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   } else {
-    // No webhook configured yet — accept and log so enquiries aren't lost during setup.
+    // Development without a webhook: accept and log (without the address) so the form can be tried.
     // To enable Slack delivery, set SLACK_WEBHOOK_URL (an Incoming Webhook URL).
-    console.log("contact enquiry (no SLACK_WEBHOOK_URL set):", JSON.stringify({ ...data, name, email, plan }));
+    console.log("contact enquiry (no SLACK_WEBHOOK_URL set):", JSON.stringify({ ...data, email: "[omitted]", name, plan }));
   }
 
   return NextResponse.json({ ok: true });

@@ -9,19 +9,13 @@
 }
 
 .inner {
-  padding-top: 88px;
+  padding-top: 80px;
   padding-bottom: 96px;
 }
 @media (min-width: 600px) {
   .inner {
-    padding-top: 120px;
-    padding-bottom: 128px;
-  }
-}
-@media (min-width: 900px) {
-  .inner {
-    padding-top: 160px;
-    padding-bottom: 160px;
+    padding-top: 96px;
+    padding-bottom: 96px;
   }
 }
 
@@ -124,14 +118,14 @@
   /* the field grid goes two-up only when the card's content box has room for it */
   container-type: inline-size;
   border-radius: 24px;
-  padding: 20px;
+  padding: 24px;
   color: var(--m-ink);
   background: rgba(255, 255, 255, 0.97);
   box-shadow: inset 0 1px 0 #fff, 0 2px 6px rgba(0, 0, 0, 0.16), 0 40px 100px -40px rgba(0, 0, 0, 0.8);
 }
 @media (min-width: 600px) {
   .formCard {
-    border-radius: 28px;
+    border-radius: 32px;
     padding: 32px;
   }
 }
@@ -158,7 +152,7 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  transition: opacity 0.3s var(--m-ease), visibility 0s linear 0.3s;
 }
 
 .fields {
@@ -202,7 +196,7 @@
 }
 .tag {
   /* the whole gap after the label text: no space character sits between them (see tag() in Contact.tsx) */
-  margin-left: 6px;
+  margin-left: 8px;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -223,10 +217,10 @@
   color: var(--m-ink);
   background: #fff;
   border: 1px solid #d5d8db;
-  border-radius: 14px;
+  border-radius: 12px;
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s var(--m-ease), box-shadow 0.2s var(--m-ease);
 }
 .control::placeholder {
   color: var(--m-mute);
@@ -242,7 +236,7 @@
 /* beats the page-wide `.lp :focus-visible` outline (and its 6px radius) inside the card */
 .section .formCard .control:focus {
   outline: none;
-  border-radius: 14px;
+  border-radius: 12px;
   border-color: var(--m-ink);
   box-shadow: 0 0 0 3px rgba(20, 24, 28, 0.12);
 }
@@ -262,7 +256,7 @@
   position: relative;
 }
 .select {
-  padding-right: 44px;
+  padding-right: 48px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -292,9 +286,10 @@
   font-size: 13px;
   line-height: 1.6;
   color: var(--m-soft);
+  text-wrap: pretty;
 }
 .fieldErr {
-  padding-left: 10px;
+  padding-left: 8px;
   border-left: 2px solid var(--m-ink);
   font-size: 13px;
   font-weight: 600;
@@ -324,7 +319,7 @@
   background: linear-gradient(180deg, #2a2f35 0%, #14181c 60%, #0d1013 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 10px -4px rgba(20, 24, 28, 0.5);
   opacity: 0;
-  transition: transform 0.45s var(--m-ease), opacity 0.25s ease;
+  transition: transform 0.45s var(--m-ease), opacity 0.25s var(--m-ease);
 }
 .seg[data-v="yes"] .thumb {
   opacity: 1;
@@ -354,13 +349,13 @@
   justify-content: center;
   width: 100%;
   min-width: 96px;
-  padding: 0 22px;
+  padding: 0 24px;
   border-radius: 999px;
   font-size: 15px;
   font-weight: 600;
   line-height: 1;
   color: var(--m-ink);
-  transition: color 0.3s ease, background-color 0.2s ease;
+  transition: color 0.3s var(--m-ease), background-color 0.2s var(--m-ease);
 }
 .segOpt:hover .segInput:not(:checked) + .segText {
   background: var(--m-paper2);
@@ -378,13 +373,15 @@
   font-size: 13px;
   line-height: 1.6;
   color: var(--m-mute);
+  text-wrap: pretty;
 }
 .alert {
-  padding: 14px 16px;
+  padding: 12px 16px;
   background: var(--m-paper2);
-  border-left: 2px solid var(--m-ink);
-  border-radius: 2px 12px 12px 2px;
+  border: 1px solid var(--m-ink);
+  border-radius: 12px;
   font-size: 15px;
+  text-wrap: pretty;
   font-weight: 600;
   line-height: 1.55;
   color: var(--m-ink);
@@ -392,10 +389,11 @@
 }
 .submit {
   width: 100%;
-  height: 52px;
+  min-height: 48px;
   margin-top: 8px;
-  padding: 0 24px;
-  font-size: 17px;
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 1.5;
 }
 .submit[aria-disabled="true"] {
   cursor: progress;
@@ -438,14 +436,19 @@
 }
 .okBody {
   max-width: 30em;
-  margin-top: 14px;
+  margin-top: 12px;
   font-size: 16px;
   color: var(--m-soft);
   text-wrap: pretty;
 }
+/* the address echoed back: ink, and never wider than the card */
+.okEmail {
+  color: var(--m-ink);
+  overflow-wrap: anywhere;
+}
 .textBtn {
   align-self: flex-start;
-  margin-top: 28px;
+  margin-top: 24px;
   padding: 4px 0;
   font-size: 15px;
   font-weight: 600;
@@ -455,10 +458,13 @@
   text-decoration-thickness: 1px;
   text-decoration-color: rgba(20, 24, 28, 0.32);
   text-underline-offset: 6px;
-  transition: text-decoration-color 0.3s ease;
+  transition: text-decoration-color 0.3s var(--m-ease);
 }
 .textBtn:hover {
   text-decoration-color: var(--m-ink);
+}
+.textBtn:active {
+  transform: translateY(1px);
 }
 .section .formCard .textBtn:focus-visible {
   outline-color: var(--m-ink);

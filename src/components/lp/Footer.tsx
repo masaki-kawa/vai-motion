@@ -4,8 +4,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { Lang } from "@/lib/i18n";
 import { useT } from "../LangProvider";
-import Html from "./Html";
-import { kernHtml } from "./typeset";
+import { kernWord } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Footer.module.css";
 
@@ -42,11 +41,14 @@ export default function Footer() {
   const lines = t("ft.line")
     .split(/<br\s*\/?>/i)
     .map((l) => l.trim())
-    .filter(Boolean)
-    .map(kernHtml); // pull a final "." in (EN only; JA ends in 「。」)
+    .filter(Boolean);
+  /* the tagline activates piece by piece: EN word by word, JA glyph by glyph (no word spaces),
+     with 、and 。bound to the glyph before them */
+  const chunks = (line: string) => (ja ? Array.from(line.replace(/(.)([、。])/g, "$1\u0000$2").split("\u0000")) : line.split(" "));
+  let idx = 0;
 
   return (
-    <footer id="footer" className={`bg-white pt-[88px] min-[900px]:pt-[120px] ${s.footer}`}>
+    <footer id="footer" className={`bg-white pt-20 min-[900px]:pt-24 ${s.footer}`}>
       <div className="mx-auto max-w-[1240px] px-4 sm:px-8">
         {/* brand line: the editorial sign-off */}
         <p
@@ -54,14 +56,22 @@ export default function Footer() {
           className={`m-display m-jp-break text-[color:var(--m-ink)] ${s.brand} ${ja ? s.ja : s.en} ${cls}`}
           style={{ letterSpacing: ja ? "-0.02em" : "-0.04em" }}
         >
-          {lines.map((line, i) => (
-            <span key={i} className="m-line">
-              <Html html={line} style={{ "--d": `${i * 80}ms` } as CSSProperties} />
-            </span>
-          ))}
+          <span className="sr-only">{lines.join(ja ? "" : " ")}</span>
+          <span aria-hidden="true">
+            {lines.map((line, i) => (
+              <span key={i} className={s.line}>
+                {chunks(line).map((w, j, arr) => (
+                  <span key={j} className={s.tw} style={{ "--i": idx++ } as CSSProperties}>
+                    {ja ? w : kernWord(w)}
+                    {!ja && j < arr.length - 1 ? " " : ""}
+                  </span>
+                ))}
+              </span>
+            ))}
+          </span>
         </p>
 
-        <div className="mt-14 border-t border-[color:var(--m-line)] pt-10 min-[900px]:mt-[72px] min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:pt-12">
+        <div className="mt-12 border-t border-[color:var(--m-line)] pt-10 min-[900px]:mt-16 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:pt-12">
           {/* logo + description */}
           <div className="min-[900px]:col-span-6">
             {/* the PNG carries wide transparent margins: crop to the mark so it sits on the text edge */}
@@ -76,7 +86,7 @@ export default function Footer() {
                 style={{ width: "125.98%", height: "auto", left: "-12.34%", top: "-59.09%" }}
               />
             </div>
-            <p className="m-body mt-5 max-w-[26em] text-[15px] text-[color:var(--m-soft)]">{t("ft.desc")}</p>
+            <p className={`m-body mt-4 max-w-[26em] ${ja ? "text-[15px]" : "text-sm"} text-[color:var(--m-soft)] [text-wrap:pretty]`}>{t("ft.desc")}</p>
           </div>
 
           {/* links: one column on desktop, a two-column grid on phones */}
@@ -89,7 +99,7 @@ export default function Footer() {
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    className="inline-block py-0.5 text-[14px] font-medium text-[color:var(--m-soft)] decoration-1 underline-offset-[5px] transition-colors duration-200 hover:text-[color:var(--m-ink)] hover:underline"
+                    className="inline-block py-0.5 text-sm font-medium text-[color:var(--m-soft)] decoration-1 underline-offset-[5px] transition-colors duration-200 hover:text-[color:var(--m-ink)] hover:underline active:translate-y-px"
                   >
                     {t(l.key)}
                   </a>
@@ -116,7 +126,7 @@ export default function Footer() {
                     onClick={() => {
                       if (!on) setLang(lang);
                     }}
-                    className={`h-8 rounded-full px-3.5 text-[13px] font-semibold transition-colors duration-300 focus-visible:!rounded-full ${
+                    className={`h-8 rounded-full px-3 text-xs font-semibold transition-colors duration-300 focus-visible:!rounded-full active:translate-y-px ${
                       on
                         ? "bg-[color:var(--m-ink)] text-white"
                         : "text-[color:var(--m-soft)] hover:text-[color:var(--m-ink)]"
@@ -129,7 +139,7 @@ export default function Footer() {
             </div>
             <a
               href="#top"
-              className="text-[14px] font-semibold text-[color:var(--m-ink)] underline decoration-[color:var(--m-line)] decoration-1 underline-offset-[5px] transition-[text-decoration-color] duration-200 hover:decoration-[color:var(--m-ink)]"
+              className="text-sm font-semibold text-[color:var(--m-ink)] underline decoration-[color:var(--m-line)] decoration-1 underline-offset-[5px] transition-[text-decoration-color] duration-200 hover:decoration-[color:var(--m-ink)] active:translate-y-px"
             >
               {t("ft.top")}
             </a>
@@ -137,9 +147,9 @@ export default function Footer() {
         </div>
 
         {/* bottom row: © left, trademark + independence line right (stacked on phones, © last) */}
-        <div className="mt-14 flex flex-col-reverse gap-4 text-[12px] text-[color:var(--m-mute)] min-[900px]:mt-20 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
+        <div className="mt-12 flex flex-col-reverse gap-4 text-xs text-[color:var(--m-mute)] min-[900px]:mt-20 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
           <p className="min-[900px]:col-span-6">{t("ft.copy")}</p>
-          <p className="m-body max-w-[46em] min-[900px]:col-span-6 min-[900px]:col-start-7">{t("ft.tm")}</p>
+          <p className="m-body max-w-[46em] [text-wrap:pretty] min-[900px]:col-span-6 min-[900px]:col-start-7">{t("ft.tm")}</p>
         </div>
       </div>
     </footer>

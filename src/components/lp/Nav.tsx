@@ -332,6 +332,10 @@ export default function Nav() {
             aria-controls="lp-menu"
             onClick={() => setOpen(true)}
           >
+            <span className={s.lines} aria-hidden="true">
+              <i />
+              <i />
+            </span>
             {t("nav.menu")}
           </button>
         </div>
@@ -358,6 +362,10 @@ export default function Nav() {
                 className={s.menuBtn}
                 onClick={() => close(true)}
               >
+                <span className={s.lines} aria-hidden="true">
+                  <i />
+                  <i />
+                </span>
                 {t("nav.close")}
               </button>
             </div>

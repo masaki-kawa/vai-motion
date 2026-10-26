@@ -30,17 +30,22 @@
   }
 }
 
-/* Deeper mask than the shared .m-line: at line-height .95 the descenders of
-   "filming" / "great" would be clipped by the default .08em. The start offset grows
-   with it so no ascender peeks through before the reveal. */
-.brand :global(.m-line) {
-  padding-bottom: 0.2em;
-  margin-bottom: -0.2em;
+/* Each <br> line is a block; its pieces (words in EN, glyphs in JA) start muted and turn to
+   full ink one after another once the line is in view: the tagline moment. */
+.line {
+  display: block;
 }
-.brand :global(.m-line) > span {
-  transform: translate(0, 118%);
-  transition-duration: 1.1s;
+.tw {
+  color: rgba(20, 24, 28, 0.3);
+  transition: color 0.5s var(--m-ease);
+  transition-delay: calc(var(--i, 0) * 60ms);
 }
-.brand:global(.is-in) :global(.m-line) > span {
-  transform: none;
+.brand:global(.is-in) .tw {
+  color: var(--m-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw {
+    color: var(--m-ink);
+    transition: none;
+  }
 }

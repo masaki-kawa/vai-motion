@@ -12,16 +12,10 @@
   list-style: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: padding-bottom 0.2s var(--m-ease);
 }
-/* open: the answer tucks up under its question (the padding returns as it closes) */
+/* open: the answer tucks up under its question (a static step: padding is layout, not motion) */
 .item[open] .q {
   padding-bottom: 12px;
-}
-@media (min-width: 900px) {
-  .item[open] .q {
-    padding-bottom: 14px;
-  }
 }
 .q::-webkit-details-marker {
   display: none;
@@ -42,7 +36,7 @@
   margin-top: calc((1lh - 32px) / 2);
   color: var(--m-ink);
   background: transparent;
-  transition: transform 0.35s var(--m-ease), background-color 0.25s ease, color 0.25s ease;
+  transition: transform 0.35s var(--m-ease), background-color 0.25s var(--m-ease), color 0.25s var(--m-ease);
 }
 .icon::before,
 .icon::after {
@@ -69,6 +63,13 @@
   color: #fff;
   background: var(--m-ink);
 }
+/* pressed */
+.q:active .icon {
+  transform: scale(0.94);
+}
+.item[open] .q:active .icon {
+  transform: rotate(45deg) scale(0.94);
+}
 
 /* JA questions and the "ask us" line: keep words whole, break at phrase boundaries where
    the browser can (auto-phrase); keep-all is the fallback */
@@ -85,7 +86,7 @@
     block-size: 0;
     opacity: 0;
     overflow-y: clip;
-    transition: block-size 0.2s var(--m-ease), opacity 0.2s ease, content-visibility 0.2s allow-discrete;
+    transition: block-size 0.2s var(--m-ease), opacity 0.2s var(--m-ease), content-visibility 0.2s allow-discrete;
   }
   .item[open]::details-content {
     block-size: auto;
@@ -95,7 +96,7 @@
 /* browsers without ::details-content still get the fade in */
 @supports not selector(::details-content) {
   .item[open] .a {
-    animation: faqIn 0.2s ease both;
+    animation: faqIn 0.2s var(--m-ease) both;
   }
 }
 @keyframes faqIn {

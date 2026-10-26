@@ -29,7 +29,7 @@ export default function Hero() {
 
   const titleStyle = {
     // phone and desktop sizes, inline so a ?lang=ja first render is right (Hero.module.css .title)
-    "--h1-m": ja ? "clamp(30px,9.2vw,44px)" : "clamp(40px,7.2vw,112px)",
+    "--h1-m": ja ? "clamp(30px,9.2vw,44px)" : "clamp(28px,8.9vw,112px)",
     "--h1-d": ja ? "clamp(32px,3.9vw,56px)" : "clamp(34px,3.5vw,52px)",
     lineHeight: ja ? 1.12 : 0.98,
     letterSpacing: ja ? "-0.02em" : "-0.04em",
@@ -50,7 +50,7 @@ export default function Hero() {
 
           <h1
             id="hero-title"
-            className={`m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-6 ${s.title}`}
+            className={`m-display m-jp-break mt-6 text-[color:var(--m-ink)] ${s.title}`}
             style={titleStyle}
           >
             {lines.map((line, i) => (
@@ -62,13 +62,17 @@ export default function Hero() {
 
           {/* .fade (opacity) may wrap these: the buttons are solid beads, nothing here has a backdrop-filter */}
           <div className={s.fade} style={delay(380)}>
-            <p className="m-body mt-6 max-w-[30em] text-[17px] text-[color:var(--m-soft)] min-[900px]:mt-7 min-[900px]:text-[18px]">
+            <p
+              className={`m-body mt-6 max-w-[30em] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-8 ${
+                ja ? "text-[17px] min-[900px]:text-[18px]" : "text-base min-[900px]:text-lg"
+              }`}
+            >
               {t("hero.sub")}
             </p>
 
             {/* MobileBar observes #hero-ctas */}
-            <div id="hero-ctas" className="mt-8 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:flex-wrap">
-              <a href="#contact" className="m-btn m-btn--dark h-[54px] px-7 text-[15px] focus-visible:!rounded-full">
+            <div id="hero-ctas" className="mt-8 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:flex-wrap min-[560px]:items-center min-[560px]:gap-x-6">
+              <a href="#contact" className="m-btn m-btn--dark min-h-12 px-6 py-3 text-base focus-visible:!rounded-full">
                 <span>{t("hero.cta1")}</span>
                 <svg
                   className="m-arrow shrink-0"
@@ -88,8 +92,14 @@ export default function Hero() {
                   />
                 </svg>
               </a>
-              <a href="#pricing" className="m-btn m-btn--light h-[54px] px-7 text-[15px] focus-visible:!rounded-full">
-                <span>{t("hero.cta2")}</span>
+              {/* one primary action above the fold: pricing is a text link (on phones the nav's
+                  Pricing link is inside the menu sheet, so this stays the visible route) */}
+              <a
+                href="#pricing"
+                className="self-center py-2 text-base font-semibold text-[color:var(--m-ink)] underline decoration-[rgba(20,24,28,0.32)] decoration-1 underline-offset-[6px] transition-[text-decoration-color] duration-300 hover:decoration-[color:var(--m-ink)] active:translate-y-px min-[560px]:self-auto min-[560px]:py-0"
+                style={{ lineHeight: ja ? 1.9 : 1.5 }}
+              >
+                {t("hero.cta2")}
               </a>
             </div>
           </div>

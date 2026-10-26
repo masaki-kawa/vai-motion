@@ -50,7 +50,7 @@ export default function Service() {
 
   return (
     <section id="service" aria-labelledby="service-title" className="relative bg-white">
-      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8 min-[900px]:pb-[160px] min-[900px]:pt-[160px]">
+      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-24 sm:px-8">
         {/* ---- header: columns 1–10 ---- */}
         <div ref={head.ref} className="min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
           <div className="min-[900px]:col-span-10">
@@ -62,7 +62,7 @@ export default function Service() {
               id="service-title"
               html={t("svc.title")}
               cls={head.cls}
-              className="m-display m-jp-break mt-5 text-[color:var(--m-ink)] min-[900px]:mt-6"
+              className="m-display m-jp-break mt-6 text-[color:var(--m-ink)]"
               style={{
                 fontSize: H2_SIZE[cur],
                 lineHeight: ja ? 1.25 : 1.02,
@@ -74,10 +74,10 @@ export default function Service() {
         </div>
 
         {/* ---- Make: plate 1–5, text 7–12 ---- */}
-        <Row kind="make" className="mt-14 min-[900px]:mt-24" />
+        <Row kind="make" className="mt-12 min-[900px]:mt-24" />
 
         {/* ---- Ads: text 1–6, plate 8–12 (the plate leads on phones) ---- */}
-        <Row kind="ads" className="mt-20 min-[900px]:mt-[120px]" />
+        <Row kind="ads" className="mt-20 min-[900px]:mt-24" />
 
         {/* ---- Improve: the loop and an example report ---- */}
         <Improve />
@@ -133,7 +133,7 @@ function Row({ kind, className }: { kind: "make" | "ads"; className: string }) {
           as="h3"
           html={t(`svc.${kind}.title`)}
           cls={cls}
-          className="m-jp-break mt-4 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-5"
+          className="m-jp-break mt-4 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-6"
           style={{
             fontSize: H3_SIZE[cur],
             lineHeight: ja ? 1.45 : 1.1,
@@ -142,7 +142,7 @@ function Row({ kind, className }: { kind: "make" | "ads"; className: string }) {
           }}
         />
         <p
-          className={`m-body m-reveal ${cls} mt-5 max-w-[34em] text-[17px] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-6`}
+          className={`m-body m-reveal ${cls} mt-6 max-w-[34em] ${ja ? "text-[17px]" : "text-base"} text-[color:var(--m-soft)] [text-wrap:pretty]`}
           style={{ ...after(0), lineHeight: ja ? 1.9 : 1.7 }}
         >
           {t(`svc.${kind}.body`)}
@@ -151,10 +151,13 @@ function Row({ kind, className }: { kind: "make" | "ads"; className: string }) {
           {[1, 2, 3, 4].map((n) => (
             <li
               key={n}
-              className="border-t border-[color:var(--m-line)] py-[14px] text-[16px] font-medium text-[color:var(--m-ink)] [text-wrap:pretty]"
+              className="border-t border-[color:var(--m-line)] py-3 text-base [text-wrap:pretty]"
               style={{ lineHeight: ja ? 1.7 : 1.5 }}
             >
-              {t(`svc.${kind}.li${n}`)}
+              {/* the benefit in bold, then the detail, on one line (the hero facts pattern) */}
+              <span className="font-semibold text-[color:var(--m-ink)]">{t(`svc.${kind}.li${n}.k`)}</span>
+              {ja ? "" : " "}
+              <span className="text-[color:var(--m-soft)]">{t(`svc.${kind}.li${n}.v`)}</span>
             </li>
           ))}
         </ul>
@@ -170,7 +173,7 @@ function Improve() {
   const { ref, cls } = useReveal<HTMLDivElement>();
 
   return (
-    <div className="m-glass mt-20 rounded-[32px] px-5 py-8 sm:p-8 min-[900px]:mt-[120px] min-[900px]:p-14">
+    <div className="m-glass mt-20 rounded-4xl px-6 py-8 sm:p-8 min-[900px]:mt-24 min-[900px]:p-12">
       <div className="min-[1100px]:grid min-[1100px]:grid-cols-12 min-[1100px]:items-center min-[1100px]:gap-x-8">
         <div ref={ref} className="min-[1100px]:col-span-6">
           <Label text={t("svc.imp.label")} cls={cls} />
@@ -178,7 +181,7 @@ function Improve() {
             as="h3"
             html={t("svc.imp.title")}
             cls={cls}
-            className="m-jp-break mt-4 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-5"
+            className="m-jp-break mt-4 font-bold text-[color:var(--m-ink)] [text-wrap:balance] min-[900px]:mt-6"
             style={{
               fontSize: H3_SIZE[cur],
               lineHeight: ja ? 1.45 : 1.1,
@@ -187,14 +190,14 @@ function Improve() {
             }}
           />
           <p
-            className={`m-body m-reveal ${cls} mt-5 max-w-[34em] text-[17px] text-[color:var(--m-soft)] [text-wrap:pretty] min-[900px]:mt-6`}
+            className={`m-body m-reveal ${cls} mt-6 max-w-[34em] ${ja ? "text-[17px]" : "text-base"} text-[color:var(--m-soft)] [text-wrap:pretty]`}
             style={{ ...after(0), lineHeight: ja ? 1.9 : 1.7 }}
           >
             {t("svc.imp.body")}
           </p>
         </div>
 
-        <div className="mt-10 min-[900px]:mt-14 min-[1100px]:col-span-5 min-[1100px]:col-start-8 min-[1100px]:mt-0">
+        <div className="mt-10 min-[900px]:mt-12 min-[1100px]:col-span-5 min-[1100px]:col-start-8 min-[1100px]:mt-0">
           <Loop />
         </div>
       </div>
@@ -282,26 +285,26 @@ function Report() {
   return (
     <figure
       ref={ref}
-      className="mt-12 border-t border-[color:var(--m-line)] pt-8 min-[900px]:mt-14 min-[900px]:pt-10"
+      className="mt-12 border-t border-[color:var(--m-line)] pt-8 min-[900px]:mt-12 min-[900px]:pt-10"
     >
       <figcaption
-        className={`m-reveal ${cls} flex flex-wrap items-baseline gap-x-4 gap-y-1.5`}
+        className={`m-reveal ${cls} flex flex-wrap items-baseline gap-x-4 gap-y-2`}
         style={delay(0)}
       >
         <span className="m-kicker" style={ja ? JA_KICKER : undefined}>
           {t("svc.report.tag")}
         </span>
-        <span className="text-[13px] leading-[1.5] text-[color:var(--m-soft)]">{t("svc.report.note")}</span>
+        <span className={`${ja ? "text-[13px]" : "text-xs"} leading-[1.5] text-[color:var(--m-soft)]`}>{t("svc.report.note")}</span>
       </figcaption>
 
-      <dl className="mt-6 grid gap-y-7 min-[900px]:mt-8 min-[900px]:grid-cols-3 min-[900px]:gap-x-8">
+      <dl className="mt-6 grid gap-y-6 min-[900px]:mt-8 min-[900px]:grid-cols-3 min-[900px]:gap-x-8">
         {([1, 2, 3] as const).map((n, i) => (
           <div key={n} className={`m-reveal ${cls}`} style={delay(120 + i * 90)}>
-            <dt className="text-[13px] font-bold leading-[1.4] text-[color:var(--m-ink)]">
+            <dt className={`${ja ? "text-[13px]" : "text-xs"} font-bold leading-[1.4] text-[color:var(--m-ink)]`}>
               {t(`svc.report.${n}.k`)}
             </dt>
             <dd
-              className="mt-2 max-w-[30em] text-[16px] text-[color:var(--m-soft)] [text-wrap:pretty]"
+              className="mt-2 max-w-[30em] text-base text-[color:var(--m-soft)] [text-wrap:pretty]"
               style={{ lineHeight: ja ? 1.85 : 1.6 }}
             >
               {t(`svc.report.${n}.v`)}
@@ -322,7 +325,7 @@ function Quote() {
   return (
     <div
       ref={ref}
-      className={`${s.quote} ${cls} relative mt-20 pt-8 min-[900px]:mt-[120px] min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:pt-10`}
+      className={`${s.quote} ${cls} relative mt-20 pt-8 min-[900px]:mt-24 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8 min-[900px]:pt-10`}
     >
       <span aria-hidden="true" className={s.rule} />
       <div className="min-[900px]:col-span-10 min-[900px]:col-start-2 min-[900px]:text-center">
@@ -354,7 +357,7 @@ function Label({ text, cls }: { text: string; cls: string }) {
   return (
     <p
       className={`m-reveal ${cls} font-bold text-[color:var(--m-ink)] ${
-        cur === "ja" ? "text-[13px] tracking-[0.06em]" : "text-[12px] uppercase tracking-[0.14em]"
+        cur === "ja" ? "text-[13px] tracking-[0.06em]" : "text-xs uppercase tracking-[0.14em]"
       }`}
       style={delay(0)}
     >

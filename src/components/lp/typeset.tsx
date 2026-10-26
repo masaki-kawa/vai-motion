@@ -10,6 +10,11 @@ import type { ReactNode } from "react";
 
 const NBSP = " ";
 
+/** EN body copy: the last two words travel together, so no single word sits alone on the last line */
+export function bindLastWords(text: string) {
+  return text.replace(/ (?=\S+$)/, NBSP);
+}
+
 export function bindShortWords(html: string) {
   return html.replace(/(^|\s)([A-Za-z]{1,2}) +(?=\S)/g, `$1$2${NBSP}`);
 }

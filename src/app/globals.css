@@ -504,7 +504,7 @@ html.lang-ja .hero-title {
   --m-night: #0b0d10;
   --m-dark-body: #c4c8cc;
   --m-dark-mute: #a7adb3;
-  --m-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --m-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lp ::selection {
@@ -542,7 +542,7 @@ html.lang-ja .m-kicker {
   color: var(--m-dark-mute);
 }
 .m-display {
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
@@ -555,9 +555,7 @@ html.lang-ja .m-jp-break {
   line-break: strict;
   overflow-wrap: anywhere;
 }
-.m-body {
-  line-height: 1.7;
-}
+/* EN body copy takes the line height of its type step (text-sm 20px, text-base 24px) */
 html.lang-ja .m-body {
   line-height: 1.9;
 }
@@ -632,7 +630,7 @@ html.lang-ja .m-body {
   border-radius: 999px;
   font-weight: 600;
   white-space: nowrap;
-  transition: transform 0.35s var(--m-ease), background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.35s var(--m-ease), background 0.3s var(--m-ease), color 0.3s var(--m-ease), box-shadow 0.3s var(--m-ease);
 }
 .m-btn:hover {
   transform: translateY(-1px);
@@ -651,7 +649,7 @@ html.lang-ja .m-body {
 .m-plate {
   position: relative;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 24px;
   isolation: isolate;
 }
 .m-plate img {
@@ -661,18 +659,18 @@ html.lang-ja .m-body {
 .m-chip {
   position: absolute;
   z-index: 3;
-  left: 20px;
-  bottom: 20px;
-  max-width: calc(100% - 40px);
+  left: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
   padding: 12px 16px;
-  border-radius: 16px;
+  border-radius: 12px; /* 24px plate − 12px inset */
 }
 
 /* ---- reveal (one shared IntersectionObserver hook toggles .is-in) ---- */
 .m-reveal {
   opacity: 0;
-  transform: translate(0, 28px);
-  transition: opacity 0.9s var(--m-ease), transform 0.9s var(--m-ease);
+  transform: translate(0, 32px);
+  transition: opacity 0.7s var(--m-ease), transform 0.7s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }
 .m-reveal.is-in {
@@ -689,7 +687,7 @@ html.lang-ja .m-body {
 .m-line > span {
   display: inline-block;
   transform: translate(0, 118%);
-  transition: transform 1s var(--m-ease);
+  transition: transform 0.8s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }
 .is-in .m-line > span,
@@ -698,15 +696,15 @@ html.lang-ja .m-body {
 }
 /* plate open: figure clip-path, image settles from 1.06 */
 .m-plate-reveal {
-  clip-path: inset(6% round 28px);
-  transition: clip-path 1.2s var(--m-ease);
+  clip-path: inset(6% round 24px);
+  transition: clip-path 0.8s var(--m-ease);
 }
 .m-plate-reveal.is-in {
-  clip-path: inset(0 round 28px);
+  clip-path: inset(0 round 24px);
 }
 .m-plate-reveal .m-plate-media {
   transform: scale(1.06);
-  transition: transform 1.6s var(--m-ease);
+  transition: transform 1.2s var(--m-ease);
 }
 .m-plate-reveal.is-in .m-plate-media {
   transform: none;
@@ -1194,7 +1192,7 @@ html.lg-refract .m-chip--light.m-lens {
   z-index: 1;
   margin: calc(-1 * var(--ov)) 8px 0;
   padding: calc(var(--ov) + 48px) 0 72px;
-  border-radius: 28px;
+  border-radius: 32px; /* same inset and radius as the Budget slab */
   color: #fff;
   background: linear-gradient(180deg, #111317 0%, #0b0d10 45%, #08090b 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -1235,6 +1233,7 @@ html.lg-refract .m-chip--light.m-lens {
       rgba(255, 255, 255, 0) 46%
     ),
     linear-gradient(112deg, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.06) 55.2%, rgba(255, 255, 255, 0) 61%);
+  /* a pendulum loop: symmetric by design, the one place the base ease-out curve is not used */
   animation: m-beams 28s ease-in-out infinite alternate;
 }
 @keyframes m-beams {

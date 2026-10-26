@@ -122,7 +122,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  padding: 0 20px;
+  padding: 0 24px;
   overflow: hidden;
   color: #fff;
 }
@@ -235,12 +235,12 @@
    ========================================================================= */
 .armed .rise {
   opacity: 0;
-  transform: translate(0, 16px);
+  transform: translate(0, 32px);
 }
 .armed :global(.is-in) .rise {
   opacity: 1;
   transform: none;
-  transition: opacity 0.9s var(--m-ease), transform 0.9s var(--m-ease);
+  transition: opacity 0.7s var(--m-ease), transform 0.7s var(--m-ease);
   transition-delay: var(--d, 0ms);
 }
 
@@ -250,7 +250,7 @@
 }
 .armed :global(.is-in) .mask > span {
   transform: none;
-  transition: transform 1s var(--m-ease) var(--d, 0ms);
+  transition: transform 0.8s var(--m-ease) var(--d, 0ms);
 }
 
 /* the big number rises inside its own box, like the heading masks. clip-path, not
@@ -263,7 +263,7 @@
 }
 .armed :global(.is-in) .num > span {
   transform: none;
-  transition: transform 1s var(--m-ease) var(--d, 0ms);
+  transition: transform 0.8s var(--m-ease) var(--d, 0ms);
 }
 
 .armed .fill {
@@ -271,7 +271,7 @@
 }
 .armed :global(.is-in) .fill {
   clip-path: inset(0 0 0 0 round var(--r));
-  transition: clip-path 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+  transition: clip-path 0.8s var(--m-ease) var(--d, 0ms);
 }
 
 .armed .later {
@@ -279,7 +279,7 @@
 }
 .armed :global(.is-in) .later {
   opacity: 1;
-  transition: opacity 0.35s ease var(--d, 0ms);
+  transition: opacity 0.35s var(--m-ease) var(--d, 0ms);
 }
 
 /* if the preference flips after arming, settle everything at once */

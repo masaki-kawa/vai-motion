@@ -94,7 +94,8 @@ export default function Contact() {
 
   const [v, setV] = useState<Values>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
-  const [errs, setErrs] = useState<{ name?: boolean; email?: boolean }>({});
+  /** email: "empty" (nothing typed) or "format" (typed, not an address), so the message can say which */
+  const [errs, setErrs] = useState<{ name?: boolean; email?: false | "empty" | "format" }>({});
   /** bumps each time a pricing card pre-selects the plan, replaying the select's ink ring */
   const [flash, setFlash] = useState(0);
   /** the form's height when it was sent: the success panel keeps it, so the card doesn't jump */
@@ -156,7 +157,10 @@ export default function Contact() {
     e.preventDefault();
     if (busyRef.current) return;
 
-    const bad = { name: !v.name.trim(), email: !isEmail(v.email) };
+    const bad = {
+      name: !v.name.trim(),
+      email: (!v.email.trim() ? "empty" : !isEmail(v.email) ? "format" : false) as false | "empty" | "format",
+    };
     setErrs(bad);
     if (bad.name || bad.email) {
       setStatus("idle");
@@ -238,7 +242,7 @@ export default function Contact() {
               id="contact-title"
               html={t("ct.title")}
               cls={head.cls}
-              className="m-display m-jp-break mt-5 text-white min-[900px]:mt-6"
+              className="m-display m-jp-break mt-6 text-white"
               style={{
                 fontSize: H2_SIZE[cur],
                 lineHeight: ja ? 1.2 : 1,
@@ -247,7 +251,7 @@ export default function Contact() {
               }}
             />
             <p
-              className={`m-reveal mt-6 max-w-[27em] text-[17px] text-[#C4C8CC] [text-wrap:pretty] min-[900px]:mt-7 ${jaPhrase} ${head.cls}`}
+              className={`m-reveal mt-6 max-w-[27em] ${ja ? "text-[17px]" : "text-base"} text-[#C4C8CC] [text-wrap:pretty] min-[900px]:mt-8 ${jaPhrase} ${head.cls}`}
               style={{ ...lh, ...after(120) }}
             >
               {t("ct.sub")}
@@ -256,7 +260,7 @@ export default function Contact() {
               {[1, 2, 3].map((n, i) => (
                 <li
                   key={n}
-                  className={`m-reveal border-t border-[rgba(255,255,255,0.12)] py-[14px] text-[15px] text-white [text-wrap:pretty] ${jaPhrase} ${head.cls}`}
+                  className={`m-reveal border-t border-[rgba(255,255,255,0.12)] py-3 ${ja ? "text-[15px]" : "text-sm"} text-white [text-wrap:pretty] ${jaPhrase} ${head.cls}`}
                   style={{ lineHeight: ja ? 1.75 : 1.55, ...after(200 + i * 70) }}
                 >
                   {t(`ct.point${n}`)}
@@ -365,15 +369,15 @@ export default function Contact() {
                           if (errs.email && isEmail(e.target.value)) setErrs((p) => ({ ...p, email: false }));
                         }}
                         onBlur={() => {
-                          if (v.email.trim() && !isEmail(v.email)) setErrs((p) => ({ ...p, email: true }));
+                          if (v.email.trim() && !isEmail(v.email)) setErrs((p) => ({ ...p, email: "format" }));
                         }}
-                        aria-invalid={errs.email || undefined}
+                        aria-invalid={errs.email ? true : undefined}
                         aria-describedby={errs.email ? "ct-email-err" : undefined}
                         className={s.control}
                       />
                       {errs.email ? (
                         <p id="ct-email-err" className={s.fieldErr}>
-                          {t("ct.err.email")}
+                          {t(errs.email === "empty" ? "ct.err.email.empty" : "ct.err.email")}
                         </p>
                       ) : null}
                     </div>
@@ -534,7 +538,15 @@ export default function Contact() {
                       {t("ct.ok.title")}
                     </h3>
                     <p id="ct-ok-body" className={`${s.okBody} ${jaPhrase}`} style={lh}>
-                      {t("ct.ok.body")}
+                      {/* the address they typed, so a typo is caught here and not weeks later */}
+                      {t("ct.ok.body")
+                        .split("{email}")
+                        .map((part, i, arr) => (
+                          <Fragment key={i}>
+                            {part}
+                            {i < arr.length - 1 ? <span className={s.okEmail}>{v.email.trim()}</span> : null}
+                          </Fragment>
+                        ))}
                     </p>
                     <button type="button" onClick={again} className={s.textBtn}>
                       {t("ct.ok.again")}
@@ -548,7 +560,7 @@ export default function Contact() {
           {/* ---- what happens next: under the head on desktop, after the card on phones ---- */}
           <div ref={next.ref} className={s.next}>
             <h3
-              className={`m-reveal text-[13px] font-semibold text-[#A7ADB3] ${next.cls}`}
+              className={`m-reveal ${ja ? "text-[13px]" : "text-xs"} font-semibold text-[#A7ADB3] ${next.cls}`}
               style={{ lineHeight: 1.5, letterSpacing: ja ? "0.04em" : "0.01em", ...delay(0) }}
             >
               {t("ct.next.title")}
@@ -558,7 +570,7 @@ export default function Contact() {
                 <li key={n} className={`${s.step} m-reveal ${next.cls}`} style={delay(80 + i * 70)}>
                   <span className={`${s.stepLabel} ${ja ? s.stepLabelJa : ""}`}>{t(`ct.next.${n}.label`)}</span>
                   <span
-                    className={`text-[15px] text-[#C4C8CC] [text-wrap:pretty] ${jaPhrase}`}
+                    className={`${ja ? "text-[15px]" : "text-sm"} text-[#C4C8CC] [text-wrap:pretty] ${jaPhrase}`}
                     style={{ lineHeight: ja ? 1.85 : 1.65 }}
                   >
                     {t(`ct.next.${n}`)}

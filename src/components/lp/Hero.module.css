@@ -16,6 +16,11 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  /* background-clip: text paints only inside the span's box, and at line-height .96 the box ends
+     above the descenders (Jakarta's y/p reach .22em below the baseline): give the box that room.
+     The parent .m-line mask has the same padding, so the overflow clip is unchanged. */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
 /* eyebrow and the copy column: a short, quiet fade-rise after the title lines */

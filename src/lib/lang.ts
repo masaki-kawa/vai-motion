@@ -14,6 +14,6 @@ export function normalizeLang(v: string | undefined | null): Lang | null {
  *  opens in English. Only the first entry counts, so a bilingual visitor who lists English
  *  first still gets English. */
 export function langFromAcceptLanguage(header: string | undefined | null): Lang | null {
-  const first = (header ?? "").split(",")[0]?.trim().toLowerCase() ?? "";
+  const first = (header ?? "").split(",")[0]?.split(";")[0]?.trim().toLowerCase() ?? "";
   return first === "ja" || first.startsWith("ja-") ? "ja" : null;
 }

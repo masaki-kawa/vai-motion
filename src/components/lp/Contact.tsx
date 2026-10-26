@@ -366,7 +366,12 @@ export default function Contact() {
                         value={v.email}
                         onChange={(e) => {
                           set("email", e.target.value);
-                          if (errs.email && isEmail(e.target.value)) setErrs((p) => ({ ...p, email: false }));
+                          if (errs.email) {
+                            // while the error shows, keep its wording true to the field: cleared once
+                            // it is an address, "format" as soon as something is typed
+                            const val = e.target.value;
+                            setErrs((p) => ({ ...p, email: isEmail(val) ? false : val.trim() ? "format" : "empty" }));
+                          }
                         }}
                         onBlur={() => {
                           if (v.email.trim() && !isEmail(v.email)) setErrs((p) => ({ ...p, email: "format" }));

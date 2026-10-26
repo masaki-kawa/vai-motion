@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { requestLang } from "@/lib/lang.server";
 
-export const metadata: Metadata = {
-  title: "Page not found — VAI MOTION",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await requestLang();
+  return {
+    title: lang === "ja" ? "ページが見つかりません — VAI MOTION" : "Page not found — VAI MOTION",
+    robots: { index: false },
+  };
+}
 
 const COPY = {
   en: {
@@ -14,24 +17,35 @@ const COPY = {
     contact: "Get a free consultation",
   },
   ja: {
-    title: "このページは見つかりませんでした。",
+    title: "ページが見つかりません。",
     body: "URLが変わったか、入力に誤りがある可能性があります。",
     home: "トップページへ戻る",
     contact: "無料で相談する",
   },
 };
 
-/** 404 in the LP's own type and tokens, in the visitor's language (cookie, else browser) */
+/** 404 in the LP's own type and tokens, in the visitor's language (cookie, else browser).
+ *  The JA metrics and font come from <html class="lang-ja">, which the root layout sets
+ *  from the same requestLang(). */
 export default async function NotFound() {
   const lang = await requestLang();
   const ja = lang === "ja";
   const c = COPY[lang];
   return (
-    <div className={`lp ${ja ? "lang-ja" : ""}`} lang={lang}>
+    <div className="lp" lang={lang}>
       <main id="top" className="flex min-h-svh flex-col justify-center bg-white px-4 py-24 sm:px-8">
         <div className="mx-auto w-full max-w-[1240px]">
           <p className="m-kicker tabular text-[color:var(--m-mute)]">404</p>
-          <h1 className="m-display m-jp-break mt-6 text-[color:var(--m-ink)]">{c.title}</h1>
+          <h1
+            className="m-display m-jp-break mt-6 text-[color:var(--m-ink)]"
+            style={{
+              /* the sections' H2 sizes (Service.tsx), since .m-display sets weight and tracking only */
+              fontSize: ja ? "clamp(24px,max(min(6.9vw,30px),4.2vw),64px)" : "clamp(36px,5vw,76px)",
+              lineHeight: ja ? 1.3 : 1.05,
+            }}
+          >
+            {c.title}
+          </h1>
           <p
             className={`m-body mt-6 max-w-[30em] ${ja ? "text-[17px]" : "text-base"} text-[color:var(--m-soft)] [text-wrap:pretty]`}
           >

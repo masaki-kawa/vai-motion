@@ -44,7 +44,14 @@ export default function Footer() {
     .filter(Boolean);
   /* the tagline activates piece by piece: EN word by word, JA glyph by glyph (no word spaces),
      with 、and 。bound to the glyph before them */
-  const chunks = (line: string) => (ja ? Array.from(line.replace(/(.)([、。])/g, "$1\u0000$2").split("\u0000")) : line.split(" "));
+  const chunks = (line: string) =>
+    ja
+      ? Array.from(line).reduce<string[]>((acc, ch) => {
+          if (/[、。]/.test(ch) && acc.length) acc[acc.length - 1] += ch;
+          else acc.push(ch);
+          return acc;
+        }, [])
+      : line.split(" ");
   let idx = 0;
 
   return (

@@ -6,6 +6,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: lang === "ja" ? "ページが見つかりません — VAI MOTION" : "Page not found — VAI MOTION",
     robots: { index: false },
+    // not the homepage's: a 404 must not declare "/" as its canonical or carry the LP's share card
+    description: null,
+    alternates: null,
+    openGraph: null,
+    twitter: null,
   };
 }
 

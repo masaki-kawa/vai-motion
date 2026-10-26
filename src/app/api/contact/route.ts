@@ -31,7 +31,7 @@ const PLAN_LABEL: Record<string, string> = {
   growthAds: `Growth + Ads (${money(DERIVED.growthAds, "en")}/mo + ad spend)`,
   light: `Videos only, Light (${money(PRICING.videos.light.price, "en")}/mo)`,
   growth: `Videos only, Growth (${money(PRICING.videos.growth.price, "en")}/mo)`,
-  promo: `One-off promo video (from ${money(PRICING.promo.short, "en")})`,
+  promo: `Standalone promo video (from ${money(PRICING.promo.short, "en")})`,
   undecided: "Not sure yet",
 };
 

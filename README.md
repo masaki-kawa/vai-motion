@@ -35,28 +35,27 @@ Without `SLACK_WEBHOOK_URL`, development validates and logs the enquiry; **produ
 ```
 src/
   app/
-    layout.tsx        fonts + metadata
-    page.tsx          assembles the sections under <LangProvider>
-    globals.css       the glass design system (ported verbatim) + keyframes
+    layout.tsx            fonts, root metadata (EN), <html lang> + .lang-ja from the vai_lang cookie / Accept-Language
+    page.tsx              the LP: language (?lang → cookie → browser), JA metadata, JSON-LD, the sections under <LangProvider>
+    not-found.tsx         404 in the visitor's language
+    sitemap.ts, robots.ts
+    icon.png, apple-icon.png   favicon + Apple icon (file-based metadata)
+    globals.css           tokens, liquid-glass materials, reveal/motion primitives, keyframes
+    api/contact/route.ts  validates the form and posts it to Slack (SLACK_WEBHOOK_URL)
+    jp/                   the older Japanese site (components at the top of src/components/, i18n.jp.ts) + legal/tokushoho
   components/
-    LangProvider.tsx  EN/JA context, useT() hook, localStorage + ?lang
-    LangToggle.tsx    EN / 日本語 pill (nav + footer)
-    Nav.tsx           sticky nav, scroll → floating glass pill, mobile menu
-    Hero.tsx          headline + CTA + scatter field
-    ScatterField.tsx  7 fly-in / bobbing video cards
-    ReelCard.tsx      video card factory (hero muted click-to-play · work custom player: play/seek/mute, sound on)
-    Ribbon.tsx        scrolling store-type marquee
-    Pain.tsx          "Sound familiar?" 3 cards
-    RecentWork.tsx    9:16 reels grid + 16:9 landscape grid
-    Hybrid.tsx        AI→human flow diagram + vertical timeline
-    Pricing.tsx       Monthly / Promo tabs, parallelogram positioning, plan cards
-    HowItWorks.tsx    6 steps
-    Contact.tsx       glass form — the message channel (model: message → invoice, no checkout); plan cards prefill it
-    Footer.tsx
+    LangProvider.tsx      EN/JA context, useT() hook, cookie + localStorage + ?lang
+    LangToggle.tsx, SkipLink.tsx, SmoothScroll.tsx, DocTitle.tsx
+    lp/                   the LP sections: Nav, Hero, Idea, Budget, Service, Pricing, How, Faq, Contact, Footer, MobileBar
+                          (+ GlassDefs, Plate, Html, typeset, useReveal, useMirror and their *.module.css)
+    (the rest)            sections of the older /jp page
   lib/
-    i18n.ts           EN / JA dictionary + industry options
-    data.ts           TINTS · LABELS · VIDEOS · WORK · HERO_SCATTER · FROM
-public/assets/        logos, category videos (mp4) + posters
+    i18n.lp.ts            EN / JA copy of the LP ({tokens} filled from pricing.ts)
+    pricing.ts            every price in one place + fillPrices()
+    lang.ts, lang.server.ts   cookie name, Accept-Language parsing, requestLang() for Server Components
+    lpImages.ts           the five image slots (ready flags)
+    i18n.ts, i18n.jp.ts, data.ts   dictionaries and data of the older /jp page
+public/assets/            logos; assets/lp/ holds the LP images. og-lp.jpg / og-lp-ja.jpg are the share images (og.jpg for /jp)
 ```
 
 ## Fidelity notes / deviations from the prototype

@@ -23,6 +23,8 @@ const config: Config = {
         ],
       },
       borderRadius: { "4xl": "2rem", "5xl": "2.5rem" },
+      // every transition-* utility runs on the LP's base curve (same as --m-ease in globals.css)
+      transitionTimingFunction: { DEFAULT: "cubic-bezier(0.22, 1, 0.36, 1)" },
       boxShadow: {
         nav: "0 8px 40px rgba(20,24,28,0.10)",
         soft: "0 10px 40px rgba(20,24,28,0.06)",

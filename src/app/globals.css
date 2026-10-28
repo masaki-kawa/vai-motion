@@ -24,8 +24,14 @@ html.lang-ja [data-i18n-html] {
   word-break: keep-all;
   line-break: strict;
 }
-section[id] {
-  scroll-margin-top: 110px;
+/* anchor targets (SmoothScroll and native) and keyboard focus land clear of the fixed nav */
+html {
+  scroll-padding-top: 110px;
+}
+/* SmoothScroll focuses a <main>/<section> anchor target (tabindex=-1): no ring around a whole section */
+main[tabindex="-1"]:focus,
+section[tabindex="-1"]:focus {
+  outline: none;
 }
 
 /* hero background: pure white + one faint cloud low-left only */
@@ -359,38 +365,87 @@ section[id] {
   box-shadow: 0 6px 20px rgba(20, 24, 28, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* hero scatter: cards fly in from all directions, then drift gently */
-.scatter-stage {
-  position: relative;
-  height: clamp(440px, 52vw, 580px);
-  /* no overflow:hidden — cards stay inset (see HERO_SCATTER) and float fully un-clipped;
-     the hero <section> still clips the fly-in entry so nothing scrolls the page */
+/* hero: staggered rise-in, then the showreel grows and side reels drift with scroll (--hp 0→1) */
+.hero {
+  --hp: 0;
 }
-.scatter-cell {
+.hero-glow {
   position: absolute;
-  transform: translate(-50%, -50%);
+  inset: -20% -10% auto;
+  height: 900px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 20% 30%, rgba(79, 132, 214, 0.18), transparent 70%),
+    radial-gradient(35% 45% at 82% 22%, rgba(156, 192, 245, 0.22), transparent 70%),
+    radial-gradient(30% 40% at 55% 60%, rgba(234, 241, 251, 0.9), transparent 70%);
+  animation: glowDrift 18s ease-in-out infinite alternate;
 }
-.scatter-fly {
-  transform: rotate(var(--rot, 0deg));
-  animation: flyIn 1.05s cubic-bezier(0.18, 0.8, 0.22, 1) var(--delay, 0s) backwards;
+@keyframes glowDrift {
+  to {
+    transform: translate3d(3%, 4%, 0) scale(1.08);
+  }
 }
-.scatter-bob {
-  animation: bob var(--bdur, 7s) ease-in-out var(--bdelay, 0s) infinite;
+.hero-title {
+  font-size: clamp(42px, 7.6vw, 96px);
+  line-height: 1.02;
 }
-@keyframes flyIn {
+html.lang-ja .hero-title {
+  font-size: clamp(34px, 6vw, 76px);
+  line-height: 1.18;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(100deg, #335fb0, #4f84d6 40%, #9cc0f5 70%, #335fb0);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 6s ease-in-out infinite alternate;
+}
+@keyframes sheen {
+  to {
+    background-position: 100% 0;
+  }
+}
+.hero-in {
+  animation: heroRise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes heroRise {
   from {
-    transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--spin, 0deg)) scale(0.5);
     opacity: 0;
+    transform: translateY(28px);
+    filter: blur(8px);
   }
 }
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-11px);
-  }
+.hero-reel {
+  aspect-ratio: 16 / 9;
+  border-radius: calc(32px - 12px * var(--hp));
+  transform: scale(calc(0.88 + 0.12 * var(--hp)));
+  transform-origin: 50% 0;
+  box-shadow: 0 40px 120px -30px rgba(20, 40, 80, 0.45);
+  will-change: transform;
+}
+.hero-side {
+  position: absolute;
+  top: 8%;
+  z-index: 20;
+  flex-direction: column;
+  gap: 16px;
+  will-change: transform;
+}
+.hero-side > * {
+  border-radius: 20px;
+  box-shadow: 0 24px 60px -20px rgba(20, 40, 80, 0.4);
+}
+.hero-side--l {
+  left: -70px;
+  transform: translateY(calc(40px - 120px * var(--hp))) rotate(-6deg);
+}
+.hero-side--r {
+  right: -70px;
+  top: 24%;
+  transform: translateY(calc(80px - 200px * var(--hp))) rotate(5deg);
 }
 
 /* text ribbon */
@@ -422,9 +477,819 @@ section[id] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scatter-fly,
-  .scatter-bob,
+  .hero-in,
+  .hero-glow,
+  .hero-title em,
   .ribbon-track {
     animation: none;
+  }
+  .hero-reel,
+  .hero-side--l,
+  .hero-side--r {
+    --hp: 1;
+  }
+}
+
+/* =========================================================================
+   LP — monochrome liquid glass (the "/" landing page: videos + Meta ads).
+   Black & white only; no accent colour. The /jp route keeps the classes above.
+   ========================================================================= */
+
+:root {
+  --m-ink: #14181c;
+  --m-soft: #4a5058;
+  --m-mute: #6b7179;
+  --m-line: rgba(20, 24, 28, 0.1);
+  --m-paper2: #f4f5f6;
+  --m-night: #0b0d10;
+  --m-dark-body: #c4c8cc;
+  --m-dark-mute: #a7adb3;
+  --m-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lp ::selection {
+  background: #14181c;
+  color: #fff;
+}
+.lp :focus-visible {
+  outline: 2px solid #14181c;
+  outline-offset: 3px;
+}
+.lp [data-theme="dark"] :focus-visible {
+  outline-color: #fff;
+}
+/* phones: keyboard focus never stops under the fixed MobileBar (12px inset + 60px pill) */
+@media (max-width: 899px) {
+  html:has(.lp) {
+    scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---- type ---- */
+.m-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-mute);
+}
+html.lang-ja .m-kicker {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+[data-theme="dark"] .m-kicker {
+  color: var(--m-dark-mute);
+}
+.m-display {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+html.lang-ja .m-display {
+  letter-spacing: -0.02em;
+}
+/* JA headings: <wbr> hints decide the breaks, never a mid-word wrap or a horizontal scroll */
+html.lang-ja .m-jp-break {
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+/* EN body copy takes the line height of its type step (text-sm 20px, text-base 24px) */
+html.lang-ja .m-body {
+  line-height: 1.9;
+}
+/* JA running text (leads, body, list items, captions): no small kana starting a line, and
+   phrase-aware breaking where the browser has it. Zero specificity, so any heading that sets
+   its own breaking (keep-all + <wbr> via .m-jp-break, inline styles, module classes) wins. */
+:where(html.lang-ja .lp) :where(p, li, dd, figcaption) {
+  line-break: strict;
+}
+@supports (word-break: auto-phrase) {
+  :where(html.lang-ja .lp) :where(p, li, dd, figcaption) {
+    word-break: auto-phrase;
+    overflow-wrap: anywhere;
+  }
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- glass rims (conic, monochrome) ---- */
+.m-rim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(20, 24, 28, 0.16) 12%,
+    rgba(255, 255, 255, 0.6) 45%,
+    rgba(20, 24, 28, 0.1) 62%,
+    rgba(255, 255, 255, 0.9)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.m-rim-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from -75deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.04) 75%,
+    rgba(255, 255, 255, 0.28)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ---- pill buttons ---- */
+.m-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.35s var(--m-ease), background 0.3s var(--m-ease), color 0.3s var(--m-ease), box-shadow 0.3s var(--m-ease);
+}
+.m-btn:hover {
+  transform: translateY(-1px);
+}
+.m-btn:active {
+  transform: scale(0.98);
+}
+.m-btn .m-arrow {
+  transition: transform 0.35s var(--m-ease);
+}
+.m-btn:hover .m-arrow {
+  transform: translateX(3px);
+}
+
+/* ---- image plates ---- */
+.m-plate {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  isolation: isolate;
+}
+.m-plate img {
+  filter: grayscale(1) contrast(1.04);
+}
+/* caption chip on a plate */
+.m-chip {
+  position: absolute;
+  z-index: 3;
+  left: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
+  padding: 12px 16px;
+  border-radius: 12px; /* 24px plate − 12px inset */
+}
+
+/* ---- reveal (one shared IntersectionObserver hook toggles .is-in) ---- */
+.m-reveal {
+  opacity: 0;
+  transform: translate(0, 32px);
+  transition: opacity 0.7s var(--m-ease), transform 0.7s var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.m-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+/* a heading line rising from behind a mask */
+.m-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+.m-line > span {
+  display: inline-block;
+  transform: translate(0, 118%);
+  transition: transform 0.8s var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.is-in .m-line > span,
+.m-line.is-in > span {
+  transform: none;
+}
+/* plate open: figure clip-path, image settles from 1.06 */
+.m-plate-reveal {
+  clip-path: inset(6% round 24px);
+  transition: clip-path 0.8s var(--m-ease);
+}
+.m-plate-reveal.is-in {
+  clip-path: inset(0 round 24px);
+}
+.m-plate-reveal .m-plate-media {
+  transform: scale(1.06);
+  transition: transform 1.2s var(--m-ease);
+}
+.m-plate-reveal.is-in .m-plate-media {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-reveal,
+  .m-line > span,
+  .m-plate-reveal,
+  .m-plate-reveal .m-plate-media {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+.m-plate-ratio {
+  aspect-ratio: var(--rm);
+}
+@media (min-width: 900px) {
+  .m-plate-ratio {
+    aspect-ratio: var(--r);
+  }
+}
+/* display punctuation: Plus Jakarta's "." and "?" sit too far from the word at tight tracking */
+.m-stop {
+  margin-left: -0.07em;
+}
+.m-q {
+  margin-left: -0.05em;
+}
+
+/* =========================================================================
+   LP — liquid glass v2 (port of the "contrast" prototype).
+   One structure, applied to the glass element itself:
+     background        tint (+ a top-lit sheen layer)
+     backdrop-filter   blur / brightness only: WebKit-safe. The SVG refraction is added
+                       separately, only under html.lg-refract (Chromium, desktop and Android).
+     box-shadow        inner light (top line, edge glow, top falloff, bottom shade) + drop
+     ::before          1px specular rim (masked conic ring). The material owns its rim:
+                       never combine .m-glass* / .m-chip--* with .m-rim / .m-rim-dark.
+   Glass only reads when something with tone sits behind it: the hero plate and the
+   pricing stage provide that. Linear gradients only: nothing that reads as a circle.
+   ========================================================================= */
+
+:root {
+  /* specular rims: bright top-left and bottom-right, a darker turn between */
+  --m-rim-milk: conic-gradient(
+    from -62deg,
+    #fff 0%,
+    rgba(20, 24, 28, 0.3) 9%,
+    rgba(20, 24, 28, 0.07) 26%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(20, 24, 28, 0.26) 59%,
+    rgba(20, 24, 28, 0.06) 80%,
+    #fff 100%
+  );
+  --m-rim-smoke: conic-gradient(
+    from -62deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.1) 10%,
+    rgba(255, 255, 255, 0.06) 30%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.08) 62%,
+    rgba(255, 255, 255, 0.06) 84%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+/* ---- the rim ring shared by every glass material ---- */
+.m-glass::before,
+.m-glass-dark::before,
+.m-glass-clear::before,
+.m-chip--light::before,
+.m-chip--dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: var(--m-rim-paint);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* MILK: white frosted glass, ink text. A white card with a lit rim over white;
+   pearl / silver over anything dark, showing what is underneath. */
+.m-glass {
+  --m-rim-paint: var(--m-rim-milk);
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.5));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 0 14px 1px rgba(255, 255, 255, 0.3),
+    inset 0 16px 22px -16px rgba(255, 255, 255, 0.95),
+    inset 0 -14px 22px -16px rgba(20, 24, 28, 0.14),
+    inset 0 -1px 0 rgba(20, 24, 28, 0.06),
+    0 1px 2px rgba(20, 24, 28, 0.06),
+    0 22px 44px -22px rgba(20, 24, 28, 0.34);
+}
+/* the Light + Ads card: thicker milk, so ink stays crisp where it crosses the dark stage
+   (pearl ≈ rgb 205 there: --m-soft 6.9:1, --m-mute 4.7:1) */
+.m-glass--thick {
+  --m-soft: #383d43;
+  --m-mute: #50565d;
+  --m-line: rgba(20, 24, 28, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.76));
+}
+
+/* SMOKE: dark smoked glass, white text. Graphite over a light page, near-black over the stage. */
+.m-glass-dark {
+  --m-rim-paint: var(--m-rim-smoke);
+  position: relative;
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 40%),
+    linear-gradient(180deg, rgba(20, 22, 25, 0.86) 0%, rgba(9, 10, 12, 0.9) 100%);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 18px rgba(255, 255, 255, 0.05),
+    inset 0 22px 34px -28px rgba(255, 255, 255, 0.28),
+    inset 0 -30px 44px -36px rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.18),
+    0 34px 70px -34px rgba(0, 0, 0, 0.7);
+}
+
+/* CLEAR: near-colourless glass, only on the dark pricing stage. White text. */
+.m-glass-clear {
+  --m-rim-paint: var(--m-rim-smoke);
+  position: relative;
+  color: #fff;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 55%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+  -webkit-backdrop-filter: blur(26px) brightness(1.1);
+  backdrop-filter: blur(26px) brightness(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 22px rgba(255, 255, 255, 0.07),
+    inset 0 40px 60px -56px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    0 40px 80px -40px rgba(0, 0, 0, 0.8);
+}
+
+/* ---- caption chips on plates ---- */
+.m-chip--light {
+  --m-rim-paint: var(--m-rim-milk);
+  /* line 2 uses var(--m-soft): 6.8:1 where the chip turns silver over a dark plate */
+  --m-soft: #2b2f34;
+  color: var(--m-ink);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.64));
+  -webkit-backdrop-filter: blur(16px) brightness(1.05);
+  backdrop-filter: blur(16px) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 0 12px 1px rgba(255, 255, 255, 0.32),
+    inset 0 12px 16px -12px rgba(255, 255, 255, 0.9),
+    inset 0 -10px 16px -12px rgba(20, 24, 28, 0.16),
+    0 12px 30px -14px rgba(0, 0, 0, 0.45);
+}
+.m-chip--dark {
+  --m-rim-paint: var(--m-rim-smoke);
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(180deg, rgba(24, 27, 31, 0.62), rgba(12, 13, 15, 0.7));
+  -webkit-backdrop-filter: blur(16px) brightness(0.9);
+  backdrop-filter: blur(16px) brightness(0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 12px rgba(255, 255, 255, 0.05),
+    inset 0 -10px 16px -12px rgba(255, 255, 255, 0.1),
+    0 12px 30px -14px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Chromium-only refraction (the old /jp warp). html.lg-refract comes from the inline
+   script in app/page.tsx (Chromium, desktop and Android). WebKit never sees a url() filter. ---- */
+html.lg-refract .m-chip--light.m-lens {
+  -webkit-backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
+  backdrop-filter: blur(3px) url(#lp-refract-s) brightness(1.05);
+}
+
+/* ---- buttons: solid glass beads (no backdrop-filter, so they cost nothing and can sit
+   inside .fade / .m-reveal wrappers) ---- */
+.m-btn--dark {
+  color: #fff;
+  background: linear-gradient(180deg, #30353b 0%, #15181c 50%, #08090b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 12px 14px -12px rgba(255, 255, 255, 0.22),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(20, 24, 28, 0.14),
+    0 14px 28px -14px rgba(20, 24, 28, 0.7);
+}
+.m-btn--dark:hover {
+  background: linear-gradient(180deg, #3a4047 0%, #1c2025 50%, #0d0f12 100%);
+}
+.m-btn--light {
+  color: var(--m-ink);
+  background: linear-gradient(180deg, #fff 0%, #f3f4f5 60%, #e9ebed 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -2px 5px rgba(20, 24, 28, 0.06),
+    0 2px 4px rgba(20, 24, 28, 0.06),
+    0 12px 26px -14px rgba(20, 24, 28, 0.42);
+}
+.m-btn--light:hover {
+  background: linear-gradient(180deg, #fff 0%, #f8f8f9 60%, #eff0f1 100%);
+}
+.m-btn--white {
+  color: var(--m-ink);
+  background: linear-gradient(180deg, #fff 0%, #eceef0 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -3px 6px rgba(20, 24, 28, 0.1),
+    0 14px 30px -14px rgba(0, 0, 0, 0.8);
+}
+.m-btn--white:hover {
+  background: #fff;
+}
+/* bead rims (replace .m-rim-dark on buttons) */
+.m-btn--dark::after,
+.m-btn--light::after,
+.m-btn--white::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.m-btn--dark::after {
+  background: conic-gradient(
+    from -62deg,
+    rgba(255, 255, 255, 0.75),
+    rgba(255, 255, 255, 0.06) 14% 36%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0.06) 64% 86%,
+    rgba(255, 255, 255, 0.75)
+  );
+}
+.m-btn--light::after {
+  background: conic-gradient(
+    from -62deg,
+    #fff,
+    rgba(20, 24, 28, 0.34) 12%,
+    rgba(20, 24, 28, 0.12) 34%,
+    #fff 50%,
+    rgba(20, 24, 28, 0.28) 62%,
+    rgba(20, 24, 28, 0.1) 84%,
+    #fff
+  );
+}
+.m-btn--white::after {
+  background: conic-gradient(
+    from -62deg,
+    #fff,
+    rgba(255, 255, 255, 0.4) 14% 36%,
+    #fff 50%,
+    rgba(20, 24, 28, 0.18) 64% 86%,
+    #fff
+  );
+}
+
+/* ---- pill rim (Nav pill, MobileBar): a straight-gradient rim, because a conic rim smears
+   along a 1120x60 pill. Lit top edge, a darker line through the rounded ends, a soft glow
+   along the bottom. Light (::before) and dark (::after) rims are stacked and cross-faded
+   by [data-tone]. The light tilts as the page scrolls (CSS scroll timeline, no JS). ---- */
+@property --m-tilt {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 168deg;
+}
+.m-pill-rim::before,
+.m-pill-rim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1.25px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity 0.42s var(--m-ease);
+}
+.m-pill-rim::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 12% 88%, rgba(255, 255, 255, 0.4)),
+    linear-gradient(
+      var(--m-tilt, 168deg),
+      #fff 0%,
+      rgba(255, 255, 255, 0.5) 30%,
+      rgba(20, 24, 28, 0.3) 58%,
+      rgba(20, 24, 28, 0.12) 72%,
+      rgba(255, 255, 255, 0.9) 100%
+    );
+}
+.m-pill-rim::after {
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 12% 88%, rgba(255, 255, 255, 0.25)),
+    linear-gradient(
+      var(--m-tilt, 168deg),
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.18) 35%,
+      rgba(255, 255, 255, 0.05) 60%,
+      rgba(255, 255, 255, 0.45) 100%
+    );
+}
+.m-pill-rim[data-tone="dark"]::before {
+  opacity: 0;
+}
+.m-pill-rim[data-tone="dark"]::after {
+  opacity: 1;
+}
+/* two slow swings of the light over the page's whole scroll (Chromium 115+, Safari 26+;
+   elsewhere the rim stays at 168deg) */
+@keyframes m-tilt {
+  0%,
+  50%,
+  100% {
+    --m-tilt: 156deg;
+  }
+  25%,
+  75% {
+    --m-tilt: 204deg;
+  }
+}
+@supports (animation-timeline: scroll()) {
+  .m-pill-rim::before,
+  .m-pill-rim::after {
+    animation: m-tilt linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+/* useMirror (Nav lens, Safari/iOS/Firefox): WebKit drops the lens's url() filter as soon as
+   anything inside it gets its own compositing layer, so the copy of the page must have none:
+   no animations or transitions (running or paused), no will-change, no backdrop filters, and
+   no 3D transforms. That last one can't be undone here, which is why every transform on the
+   LP is 2D (translate(), never translate3d(), even with z = 0). */
+.lp-mirror *,
+.lp-mirror *::before,
+.lp-mirror *::after {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ---- hero studio: what the empty hero slot shows until hero.jpg is ready
+   (Plate scene="studio"). A dark wall, a floor, one thin vertical line of light standing on
+   the horizon, one slow pass of light. The line runs up under the nav, so the nav visibly
+   frosts it; its floor reflection runs behind the caption chip. ---- */
+.m-studio {
+  --hz: 54%; /* horizon */
+  --tx: 46%; /* the light line: sits between the logo and the toggle on phones */
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) calc(var(--tx) - 24%),
+      rgba(255, 255, 255, 0.07) var(--tx),
+      rgba(255, 255, 255, 0) calc(var(--tx) + 24%)
+    ),
+    linear-gradient(180deg, #1b1d20 0%, #101113 calc(var(--hz) - 0.5%), #060708 var(--hz), #0b0c0d 100%);
+}
+@media (min-width: 900px) {
+  /* the line runs through the nav's free glass, between the links and EN | 日本語, on a
+     column where #lp-refract bends it, so the header shows the bend even at rest. Fitted to
+     the measured gap (EN and JA links differ in width) from about 1100px up; the pill-relative
+     column is constant from 1152px. Narrower, the gap is too tight and the line may pass under
+     the toggle. Re-measure if the pill's width, shadow or links change. */
+  .m-studio {
+    --hz: 62%;
+    --tx: max(8%, min(258px, 1080px - 50vw, 25vw - 28px));
+  }
+  html.lang-ja .m-studio {
+    --tx: max(8%, min(268px, 1088px - 50vw, 25vw + 12px));
+  }
+}
+.m-studio-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--hz);
+  bottom: 0;
+  /* the line's reflection: a narrow vertical streak, fading down the floor */
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) calc(var(--tx) - 7px),
+    rgba(255, 255, 255, 0.26) var(--tx),
+    rgba(255, 255, 255, 0) calc(var(--tx) + 7px)
+  );
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.3) 45%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.3) 45%, transparent 85%);
+}
+.m-studio-floor::before {
+  /* the horizon: where the wall meets the floor */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.24) var(--tx), rgba(255, 255, 255, 0));
+}
+.m-studio-line {
+  position: absolute;
+  left: var(--tx);
+  top: 0;
+  width: 2px;
+  height: var(--hz);
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, #fff 26%, #fff 100%);
+  box-shadow:
+    0 0 8px 1px rgba(255, 255, 255, 0.45),
+    0 0 36px 6px rgba(255, 255, 255, 0.1);
+}
+.m-studio-pass {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translate(-110%, 0) skewX(-14deg);
+  animation: m-pass 12s var(--m-ease) infinite;
+}
+@keyframes m-pass {
+  0% {
+    transform: translate(-110%, 0) skewX(-14deg);
+  }
+  62%,
+  100% {
+    transform: translate(290%, 0) skewX(-14deg);
+  }
+}
+
+/* ---- pricing stage: a near-black slab that slides up under the plan cards (negative top
+   margin), so both cards sit on its edge and show it, blurred, through their lower halves.
+   Pricing.tsx renders it after the cards' grid (which is z-2) with data-theme="dark". ---- */
+.m-stage {
+  --ov: 260px; /* how far the stage reaches up behind the cards */
+  --m-line: rgba(255, 255, 255, 0.14);
+  position: relative;
+  z-index: 1;
+  margin: calc(-1 * var(--ov)) 8px 0;
+  padding: calc(var(--ov) + 48px) 0 72px;
+  border-radius: 32px; /* same inset and radius as the Budget slab */
+  color: #fff;
+  background: linear-gradient(180deg, #111317 0%, #0b0d10 45%, #08090b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+@media (min-width: 900px) {
+  .m-stage {
+    --ov: 300px;
+    margin: calc(-1 * var(--ov)) 12px 0;
+    padding: calc(var(--ov) + 80px) 0 104px;
+    border-radius: 40px; /* same inset and radius as the Budget slab */
+  }
+}
+.m-stage-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.m-stage-spill {
+  /* light gathering under the stage's top edge, behind the cards' lower halves */
+  position: absolute;
+  inset: 0 0 auto;
+  height: 640px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0));
+}
+.m-stage-beams {
+  /* two faint beams, each with a hard leading edge: crisp beside the clear card,
+     frosted inside it (a soft gradient would look the same either way) */
+  position: absolute;
+  inset: -10% -40%;
+  background:
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.1) 30.3%,
+      rgba(255, 255, 255, 0.025) 41%,
+      rgba(255, 255, 255, 0) 46%
+    ),
+    linear-gradient(112deg, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.06) 55.2%, rgba(255, 255, 255, 0) 61%);
+  /* a pendulum loop: symmetric by design, the one place the base ease-out curve is not used */
+  animation: m-beams 28s ease-in-out infinite alternate;
+}
+@keyframes m-beams {
+  from {
+    transform: translate(-6%, 0);
+  }
+  to {
+    transform: translate(8%, 0);
+  }
+}
+
+/* loops behind glass stop while their surface is off screen (usePauseOffscreen) */
+[data-paused] .m-studio-pass,
+[data-paused] .m-stage-beams {
+  animation-play-state: paused;
+}
+
+/* the plate reveal is over: drop the clip-path, so the plate is never a backdrop root
+   (overflow + border-radius on .m-plate still round the corners) */
+.m-plate-reveal.is-open {
+  clip-path: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-studio-pass {
+    animation: none;
+    transform: translate(70%, 0) skewX(-14deg);
+  }
+  .m-stage-beams {
+    animation: none;
+  }
+  .m-pill-rim::before,
+  .m-pill-rim::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* no backdrop blur at all: near-solid fills, so text never sits on busy content */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .m-glass {
+    background: linear-gradient(180deg, #fff, #f8f9fa);
+  }
+  .m-glass--thick {
+    background: #fff;
+  }
+  .m-glass-dark {
+    background: linear-gradient(180deg, #1b1e22, #0e1013);
+  }
+  .m-glass-clear {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .m-chip--light {
+    background: rgba(255, 255, 255, 0.94);
+  }
+  .m-chip--dark {
+    background: rgba(16, 18, 21, 0.92);
   }
 }

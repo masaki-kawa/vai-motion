@@ -1,0 +1,51 @@
+/* Footer — mobilebar clearance and the editorial brand line. */
+
+/* below 900px the fixed mobilebar sits over the bottom of the page */
+.footer {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 900px) {
+  .footer {
+    padding-bottom: 40px;
+  }
+}
+
+/* Brand line. Each <br> line is its own mask line, so the break is always forced.
+   Phones use the spec sizes (EN clamp(34px,10vw,…), JA 15vw); the caps are raised/lowered
+   only so the size meets the desktop clamp at 768px with no jump. */
+.en {
+  font-size: clamp(34px, 10vw, 66px);
+  line-height: 0.95;
+}
+.ja {
+  font-size: min(15vw, 80px);
+  line-height: 1.1;
+}
+@media (min-width: 768px) {
+  .en {
+    font-size: clamp(40px, 8.6vw, 132px);
+  }
+  .ja {
+    font-size: clamp(44px, 10.5vw, 172px);
+  }
+}
+
+/* Each <br> line is a block; its pieces (words in EN, glyphs in JA) start muted and turn to
+   full ink one after another once the line is in view: the tagline moment. */
+.line {
+  display: block;
+}
+.tw {
+  color: rgba(20, 24, 28, 0.3);
+  transition: color 0.5s var(--m-ease);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.brand:global(.is-in) .tw {
+  color: var(--m-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw {
+    color: var(--m-ink);
+    transition: none;
+  }
+}

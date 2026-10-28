@@ -1,0 +1,49 @@
+/* Idea — the argument in three claims, beside a sticky plate.
+   Resting states are the visible ones under prefers-reduced-motion. */
+
+/* ---- H2: one mask per word (EN) or <wbr> phrase (JA), so the heading keeps its
+   natural, balanced wrapping and each rendered line can still rise 80ms after the last.
+   Idea.tsx measures which line every mask sits on and sets its delay. ---- */
+.title .word:global(.m-line) {
+  display: inline-block;
+  /* top-aligned: an overflow:hidden inline-block would otherwise sit on its bottom
+     edge and add a descender's worth of space to every line */
+  vertical-align: top;
+  /* room for g / y descenders at line-height 1.02 */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+/* deeper start than the shared 105%, so no ascender tip peeks over the mask */
+.title .word > span {
+  transform: translate(0, 125%);
+}
+.title:global(.is-in) .word > span {
+  transform: none;
+}
+
+/* ---- claim blocks: the top hairline draws in from the left as the block arrives ---- */
+.block {
+  position: relative;
+}
+.rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--m-line);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 1.4s var(--m-ease);
+}
+.block:global(.is-in) .rule {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title .word > span,
+  .rule {
+    transform: none !important;
+    transition: none !important;
+  }
+}

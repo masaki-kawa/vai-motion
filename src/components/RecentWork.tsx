@@ -46,7 +46,7 @@ export default function RecentWork() {
           {wides.length > 0 && (
             <div className="mt-12">
               <GroupLabel label={t("work.grp.promo")} count={wides.length} />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {wides.map((w, i) => (
                   <ReelCard key={`w-${i}`} cat={w.cat} hover wide controls />
                 ))}

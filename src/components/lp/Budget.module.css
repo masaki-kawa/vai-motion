@@ -1,0 +1,298 @@
+/* Budget — one honest worked example on the first dark slab.
+   Progressive motion: every rule that hides something is scoped to `.armed`, which
+   Budget.tsx only sets after hydration, with motion allowed and the slab still below
+   the fold. Without JS (or before it runs) the chart and the number are final. */
+
+.slab {
+  isolation: isolate;
+  background: linear-gradient(180deg, #121519, #0a0c0e);
+}
+
+/* ---- H2: one mask per word (EN) or <wbr> phrase (JA), so the heading keeps its
+   natural, balanced wrapping and each rendered line rises 80ms after the last ---- */
+.mask {
+  display: inline-block;
+  /* top-aligned, or an overflow:hidden inline-block adds a descender's depth to every line */
+  vertical-align: top;
+  overflow: hidden;
+  /* room for g / y descenders at line-height 1.04 */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+.mask > span {
+  display: inline-block;
+}
+
+/* ---- big number row: number left, caption right beside it on its last baseline (desktop) ---- */
+.bigRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+@media (min-width: 900px) {
+  .bigRow {
+    flex-direction: row;
+    justify-content: flex-start;
+    column-gap: 48px;
+    align-items: flex-end;
+    align-items: last baseline;
+  }
+}
+.caption {
+  flex: none;
+}
+@media (min-width: 900px) {
+  .caption {
+    flex: 0 1 20em;
+  }
+}
+
+/* the number: Jakarta numerals in both languages (beats `html.lang-ja *`) */
+.num.num,
+.num.num * {
+  font-family: var(--font-jakarta), var(--font-noto-jp), system-ui, sans-serif;
+}
+.num {
+  display: inline-grid;
+  flex: none;
+  /* 88px on phones, 15vw from ~590px, capped at 224px */
+  font-size: clamp(88px, 15vw, 224px);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+}
+.num > span {
+  white-space: nowrap;
+}
+/* "$" / "A$" as a small superior sign, its top level with the figures' cap height
+   (Jakarta caps ≈ .72em): raise = .72em × (1 − k) / k in the sign's own em */
+.cur {
+  --k: 0.5;
+  font-size: calc(var(--k) * 1em);
+  vertical-align: calc(0.72em * (1 - var(--k)) / var(--k));
+  margin-right: 0.04em;
+  letter-spacing: -0.02em;
+}
+/* a two-letter sign ("A$") steps down so it doesn't outweigh the figures */
+.curWide {
+  --k: 0.42;
+}
+
+/* ---- budget bars ---- */
+.track {
+  --r: 12px;
+  position: relative;
+  display: grid;
+  column-gap: 4px;
+  height: 48px;
+}
+@media (min-width: 900px) {
+  .track {
+    --r: 16px;
+    height: 72px;
+  }
+}
+.seg {
+  position: relative;
+  min-width: 0;
+}
+
+/* fill layer — the only thing that wipes; no backdrop-filter anywhere on the bars */
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r);
+}
+.fShoot {
+  background: #33383e;
+}
+.fFee {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.fAds {
+  background: #f2f2f0;
+}
+
+/* label layer (desktop): sits above the fill, never scaled */
+.lab {
+  position: relative;
+  display: none;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 24px;
+  overflow: hidden;
+  color: #fff;
+}
+@media (min-width: 900px) {
+  .lab {
+    display: flex;
+  }
+}
+.main {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.sub {
+  font-size: 13px;
+  line-height: 1.35;
+  color: #c4c8cc;
+}
+.onLight {
+  color: #14181c;
+}
+.onLight .sub {
+  color: #4a5058;
+}
+
+/* ---- phone legend: 10px square keys in the segment's own fill ---- */
+.legend {
+  display: grid;
+  column-gap: 4px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #c4c8cc;
+}
+/* Row A: the one legend item left, "Ad spend: $0" right, as on desktop */
+.legendSplit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px 16px;
+}
+.legendSplit > :last-child {
+  color: #a7adb3;
+}
+@media (min-width: 900px) {
+  .legend {
+    display: none;
+  }
+}
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.key {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  /* centred on the label's first line */
+  margin-top: 4px;
+  margin-top: calc((1lh - 10px) / 2);
+}
+.kShoot {
+  background: #33383e;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.kFee {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.kAds {
+  background: #f2f2f0;
+}
+.value {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+}
+
+/* Row A on desktop: outcome left, "Ad spend: $0" right under the bar's end */
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 32px;
+}
+.adsDesk {
+  display: none;
+  flex: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #a7adb3;
+}
+@media (min-width: 900px) {
+  .adsDesk {
+    display: block;
+  }
+}
+
+/* =========================================================================
+   Armed start states. Transitions live on the `.is-in` rules only, so arming
+   (going to the start state) is instant and only the reveal animates.
+   ========================================================================= */
+.armed .rise {
+  opacity: 0;
+  transform: translate(0, 32px);
+}
+.armed :global(.is-in) .rise {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s var(--m-ease), transform 0.7s var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+
+/* deeper than 100%, so no ascender tip peeks over the mask */
+.armed .mask > span {
+  transform: translate(0, 125%);
+}
+.armed :global(.is-in) .mask > span {
+  transform: none;
+  transition: transform 0.8s var(--m-ease) var(--d, 0ms);
+}
+
+/* the big number rises inside its own box, like the heading masks. clip-path, not
+   overflow:hidden, so the row's last-baseline alignment with the caption is untouched */
+.armed .num {
+  clip-path: inset(-0.2em -0.2em 0 -0.2em);
+}
+.armed .num > span {
+  transform: translate(0, 110%);
+}
+.armed :global(.is-in) .num > span {
+  transform: none;
+  transition: transform 0.8s var(--m-ease) var(--d, 0ms);
+}
+
+.armed .fill {
+  clip-path: inset(0 100% 0 0 round var(--r));
+}
+.armed :global(.is-in) .fill {
+  clip-path: inset(0 0 0 0 round var(--r));
+  transition: clip-path 0.8s var(--m-ease) var(--d, 0ms);
+}
+
+.armed .later {
+  opacity: 0;
+}
+.armed :global(.is-in) .later {
+  opacity: 1;
+  transition: opacity 0.35s var(--m-ease) var(--d, 0ms);
+}
+
+/* if the preference flips after arming, settle everything at once */
+@media (prefers-reduced-motion: reduce) {
+  .armed .rise,
+  .armed .mask > span,
+  .armed .num,
+  .armed .num > span,
+  .armed .fill,
+  .armed .later {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+  }
+}

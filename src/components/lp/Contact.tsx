@@ -5,6 +5,7 @@ import { useT } from "../LangProvider";
 import { bindShortWords, kernHtml, kernWord, splitHeading } from "./typeset";
 import { useReveal } from "./useReveal";
 import s from "./Contact.module.css";
+import { BUSINESS } from "@/lib/legal";
 
 /* ---- form vocabulary: stable English values, translated labels ---- */
 
@@ -267,6 +268,18 @@ export default function Contact() {
                 </li>
               ))}
             </ul>
+            <p
+              className={`m-reveal mt-8 ${ja ? "text-[15px]" : "text-sm"} text-[#C4C8CC] [text-wrap:pretty] ${jaPhrase} ${head.cls}`}
+              style={{ lineHeight: ja ? 1.75 : 1.55, ...after(440) }}
+            >
+              {t("ct.mail")}{ja ? "" : " "}
+              <a
+                href={`mailto:${BUSINESS.email}`}
+                className="font-semibold text-white underline decoration-[rgba(255,255,255,0.35)] decoration-1 underline-offset-[5px] transition-[text-decoration-color] duration-300 hover:decoration-white [overflow-wrap:anywhere]"
+              >
+                {BUSINESS.email}
+              </a>
+            </p>
           </div>
 
           {/* ---- the form card: columns 7–12 ---- */}

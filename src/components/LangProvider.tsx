@@ -60,6 +60,12 @@ export function LangProvider({
     applyHtml(cur);
     // storage and cookies can throw (blocked site data, sandboxed frames); the page works without them
     try {
+      // ?lang= wins: pages that cannot read it on the server (privacy, terms) still open in the linked language
+      const q = new URLSearchParams(window.location.search).get("lang");
+      if ((q === "en" || q === "ja") && q !== cur) {
+        setLang(q);
+        return;
+      }
       const hasCookie = document.cookie.includes(`${LANG_COOKIE}=`);
       if (!hasCookie) {
         const saved = window.localStorage.getItem(STORAGE_KEY);

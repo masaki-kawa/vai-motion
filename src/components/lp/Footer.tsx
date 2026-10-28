@@ -17,6 +17,11 @@ const LINKS = [
   { href: "#contact", key: "ft.contact" },
 ] as const;
 
+const LEGAL = [
+  { href: "/privacy", key: "ft.privacy" },
+  { href: "/terms", key: "ft.terms" },
+] as const;
+
 const LANGS: { lang: Lang; key: string }[] = [
   { lang: "en", key: "nav.lang.en" },
   { lang: "ja", key: "nav.lang.ja" },
@@ -30,7 +35,8 @@ const PENDING: Record<string, Record<Lang, string>> = {
   "ft.nav": { en: "Footer", ja: "フッター" },
 };
 
-export default function Footer() {
+/** base: "" on the LP (hash links scroll), "/" on other pages (links go back to the LP) */
+export default function Footer({ base = "" }: { base?: string }) {
   const { t, cur, setLang } = useT();
   const ja = cur === "ja";
   const tx = (k: string) => {
@@ -105,7 +111,7 @@ export default function Footer() {
               {LINKS.map((l) => (
                 <li key={l.href}>
                   <a
-                    href={l.href}
+                    href={base + l.href}
                     className="inline-block py-0.5 text-sm font-medium text-[color:var(--m-soft)] decoration-1 underline-offset-[5px] transition-colors duration-200 hover:text-[color:var(--m-ink)] hover:underline active:translate-y-px"
                   >
                     {t(l.key)}
@@ -145,7 +151,7 @@ export default function Footer() {
               })}
             </div>
             <a
-              href="#top"
+              href={base + "#top"}
               className="text-sm font-semibold text-[color:var(--m-ink)] underline decoration-[color:var(--m-line)] decoration-1 underline-offset-[5px] transition-[text-decoration-color] duration-200 hover:decoration-[color:var(--m-ink)] active:translate-y-px"
             >
               {t("ft.top")}
@@ -155,7 +161,18 @@ export default function Footer() {
 
         {/* bottom row: © left, trademark + independence line right (stacked on phones, © last) */}
         <div className="mt-12 flex flex-col-reverse gap-4 text-xs text-[color:var(--m-mute)] min-[900px]:mt-20 min-[900px]:grid min-[900px]:grid-cols-12 min-[900px]:gap-x-8">
-          <p className="min-[900px]:col-span-6">{t("ft.copy")}</p>
+          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 min-[900px]:col-span-6">
+            <span>{t("ft.copy")}</span>
+            {LEGAL.map((l) => (
+              <a
+                key={l.href}
+                href={ja ? `${l.href}?lang=ja` : l.href}
+                className="font-medium text-[color:var(--m-soft)] decoration-1 underline-offset-[5px] transition-colors duration-200 hover:text-[color:var(--m-ink)] hover:underline active:translate-y-px"
+              >
+                {t(l.key)}
+              </a>
+            ))}
+          </p>
           <p className="m-body max-w-[46em] [text-wrap:pretty] min-[900px]:col-span-6 min-[900px]:col-start-7">{t("ft.tm")}</p>
         </div>
       </div>

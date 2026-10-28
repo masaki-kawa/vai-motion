@@ -19,6 +19,7 @@ import { I18N_LP } from "@/lib/i18n.lp";
 import type { Lang } from "@/lib/i18n";
 import { normalizeLang } from "@/lib/lang";
 import { requestLang } from "@/lib/lang.server";
+import { BUSINESS } from "@/lib/legal";
 
 /** Chromium only, desktop and Android: turns on the url(#lp-refract) backdrop refraction (the
  *  old /jp nav's warp). A "Chromium" userAgentData brand, or (no client hints: an insecure
@@ -29,7 +30,7 @@ import { requestLang } from "@/lib/lang.server";
  *  the same warp. ?webkit forces that path in Chromium (?webkit&nomirror: the plain blur). */
 const REFRACT = `(function(d){try{var n=navigator,b=n.userAgentData&&n.userAgentData.brands,u=n.userAgent||"",c=(b&&b.some&&b.some(function(x){return x.brand==="Chromium"}))||(n.vendor==="Google Inc."&&/\\b(Headless)?Chrome\\/\\d/.test(u)&&!/\\b(CriOS|EdgiOS|FxiOS|OPiOS)\\b/.test(u));if(c&&!/[?&]webkit\\b/.test(location.search))d.classList.add("lg-refract")}catch(e){}})(document.documentElement)`;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vaimotion.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vai-motion.vercel.app";
 
 /** the FAQ copy without its inline markup, for structured data */
 function plain(html: string) {
@@ -53,6 +54,7 @@ function jsonLd(lang: Lang) {
       name: "VAI MOTION",
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/assets/vai-logo-full.png`,
+      email: BUSINESS.email,
       areaServed: { "@type": "City", name: "Sydney" },
       address: { "@type": "PostalAddress", addressLocality: "Sydney", addressRegion: "NSW", addressCountry: "AU" },
     },

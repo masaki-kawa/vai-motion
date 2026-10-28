@@ -22,10 +22,10 @@ const title = "VAI MOTION — Videos and Meta ads for Sydney businesses";
 const description =
   "We make short videos from the photos you already have and run them as Instagram and Facebook ads near your shop. No filming. Monthly AUD plans, cancel anytime.";
 
-// set NEXT_PUBLIC_SITE_URL to the real domain in production (falls back to the placeholder)
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vaimotion.com";
+// set NEXT_PUBLIC_SITE_URL to the production origin (the Vercel URL until a domain is chosen, 2026-10-28)
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vai-motion.vercel.app";
 if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_SITE_URL) {
-  console.warn("NEXT_PUBLIC_SITE_URL is not set: canonical, hreflang, og:url and the sitemap use the placeholder domain.");
+  console.warn("NEXT_PUBLIC_SITE_URL is not set: canonical, hreflang, og:url and the sitemap use the Vercel URL.");
 }
 
 /* the same page serves both languages: "/" is English (and the x-default), "/?lang=ja" Japanese.

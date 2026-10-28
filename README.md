@@ -38,6 +38,7 @@ src/
     layout.tsx            fonts, root metadata (EN), <html lang> + .lang-ja from the vai_lang cookie / Accept-Language
     page.tsx              the LP: language (?lang → cookie → browser), JA metadata, JSON-LD, the sections under <LangProvider>
     not-found.tsx         404 in the visitor's language
+    privacy/, terms/      privacy policy and terms of service (copy in lib/legal.ts), in the visitor's language
     sitemap.ts, robots.ts
     icon.png, apple-icon.png   favicon + Apple icon (file-based metadata)
     globals.css           tokens, liquid-glass materials, reveal/motion primitives, keyframes
@@ -54,6 +55,7 @@ src/
     pricing.ts            every price in one place + fillPrices()
     lang.ts, lang.server.ts   cookie name, Accept-Language parsing, requestLang() for Server Components
     lpImages.ts           the five image slots (ready flags)
+    legal.ts              business details (public email, address) + the privacy policy and terms in both languages
     i18n.ts, i18n.jp.ts, data.ts   dictionaries and data of the older /jp page
 public/assets/            logos; assets/lp/ holds the LP images. og-lp.jpg / og-lp-ja.jpg are the share images (og.jpg for /jp)
 ```
@@ -84,4 +86,4 @@ public/assets/            logos; assets/lp/ holds the LP images. og-lp.jpg / og-
 ## TODO before launch
 
 - Set `SLACK_WEBHOOK_URL` so contact enquiries are delivered, then send one test enquiry through the live form.
-- Set `NEXT_PUBLIC_SITE_URL` to the production domain (`vaimotion.com` is a placeholder) and confirm the public contact address.
+- Set `NEXT_PUBLIC_SITE_URL` when a domain replaces the Vercel URL (2026-10-28: no domain yet). Public contact address: `BUSINESS.email` in `src/lib/legal.ts`.
